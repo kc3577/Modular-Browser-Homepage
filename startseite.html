@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Startseite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link id="faviconLink" rel="icon" type="image/x-icon" href="">
+    <style>
+        /* Grundlegende Stile für die Seite */
+        html, body { /* Stellt sicher, dass HTML und Body die volle Höhe einnehmen */
+            height: 100%;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, background-image 0.3s ease; /* Sanfter Übergang für Hintergrund */
+            background-size: cover; /* Bild deckt den gesamten Bereich ab */
+            background-position: center; /* Bild zentrieren */
+            background-repeat: no-repeat; /* Bild nicht wiederholen */
+            background-attachment: fixed; /* Bild beim Scrollen fixieren */
+        }
+
+        /* Stil für den Button-Container, um die Buttons zu zentrieren */
+        .tiles-grid {
+            display: grid;
+            /* Spaltenanzahl und deren Breite sind fest, basierend auf max-cols und base-tile-height */
+            grid-template-columns: repeat(var(--max-cols, 6), var(--base-tile-height, 150px));
+            /* Reihenhöhe ist fest, basierend auf base-tile-height */
+            grid-auto-rows: var(--base-tile-height, 150px);
+            gap: 1rem; /* Abstand zwischen den Buttons */
+            /* Feste Breite des Rasters, berechnet aus Spaltenanzahl, Kachelhöhe, Lücken UND Padding */
+            width: calc(var(--max-cols, 6) * var(--base-tile-height, 150px) + (var(--max-cols, 6) - 1) * 1rem + 2rem);
+            margin: 0 auto; /* Zentriert das Raster */
+            padding: 1rem; /* Innenabstand */
+            /* Maximale Höhe des Rasters basierend auf sichtbaren Reihen und Kachelhöhe */
+            max-height: calc(var(--max-rows, 3) * var(--base-tile-height, 150px) + (var(--max-rows, 3) - 1) * 1rem);
+            overflow-y: auto; /* Vertikales Scrollen ermöglichen, wenn Inhalt die max-height überschreitet */
+            overflow-x: hidden; /* Horizontalen Scrollbalken explizit verhindern */
+        }
+
+        /* Stil für einzelne Buttons (Kacheln) */
+        .tile {
+            display: flex; /* Use flex to center content when only title is visible */
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.5rem; /* Abgerundete Ecken */
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover-Effekte */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+            /* aspect-ratio: 1 / 1; REMOVED: Aspect ratio is now controlled by grid-column/grid-row */
+            position: relative; /* For overflow hidden, if image goes outside */
+            overflow: hidden; /* Ensures image respects border-radius */
+        }
+
+        /* Hover-Effekt für die Buttons */
+        .tile:hover {
+            transform: scale(1.05); /* Leichtes Vergrößern beim Hover */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Stärkerer Schatten beim Hover */
+        }
+
+        /* Stil für das Bild/Icon innerhalb der Kachel */
+        .tile img {
+            width: 100%; /* Bild füllt die gesamte Breite des Containers */
+            height: 100%; /* Bild füllt die gesamte Höhe des Containers */
+            object-fit: contain; /* Bild anpassen, um in den Bereich zu passen, ohne beschnitten zu werden */
+            border-radius: 0.5rem; /* Abgerundete Ecken für Bilder - MATCHES PARENT */
+            position: absolute; /* Position absolut, um den Button auszufüllen */
+            top: 0;
+            left: 0;
+            z-index: 1; /* Bild unter dem Titel */
+        }
+
+        /* Stil für den Titel innerhalb der Kachel */
+        .tile h3 {
+            font-size: 1.125rem; /* Schriftgröße des Titels */
+            font-weight: 600; /* Halbfett */
+            white-space: nowrap; /* Verhindert Zeilenumbruch */
+            overflow: hidden; /* Überlaufenden Text ausblenden */
+            text-overflow: ellipsis; /* Drei Punkte bei Überlauf */
+            max-width: 90%; /* Maximale Breite des Titels, mit etwas Rand */
+            padding: 0.5rem; /* Padding für den Titel */
+            position: absolute; /* Position absolut, um über dem Bild zu liegen */
+            top: 50%; /* Vertikal zentrieren */
+            left: 50%; /* Horizontal zentrieren */
+            transform: translate(-50%, -50%); /* Exakte Zentrierung */
+            z-index: 2; /* Titel über dem Bild */
+            text-shadow: 0 0 5px rgba(0,0,0,0.7); /* Leichter Schatten für bessere Lesbarkeit */
+        }
+
+        /* CSS-Klassen für verschiedene Kachelgrößen */
+        /* Die Größen werden nun direkt durch das Spannen der quadratischen Grid-Zellen kontrolliert */
+        .tile[data-size="1x1"] {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+        .tile[data-size="2x1"] { /* Breite Kachel */
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+        .tile[data-size="1x2"] { /* Hohe Kachel */
+            grid-column: span 1;
+            grid-row: span 2;
+        }
+        .tile[data-size="2x2"] { /* Große Kachel */
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+        .tile[data-size="3x1"] { /* Sehr Breite Kachel */
+            grid-column: span 3;
+            grid-row: span 1;
+        }
+        .tile[data-size="1x3"] { /* Sehr Hohe Kachel */
+            grid-column: span 1;
+            grid-row: span 3;
+        }
+
+        /* Stil für das Modal (Einstellungsfenster) */
+        .modal {
+            display: none; /* Standardmäßig versteckt */
+            position: fixed;
+            z-index: 100; /* Über allem anderen */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Scrollbar, wenn Inhalt zu groß */
+            background-color: rgba(0, 0, 0, 0.7); /* Halbtransparenter Hintergrund */
+            backdrop-filter: blur(5px); /* Weichzeichner-Effekt */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #2d3748; /* Dunkler Hintergrund für das Modal */
+            padding: 2rem;
+            border-radius: 0.75rem; /* Abgerundete Ecken */
+            width: 90%;
+            max-width: 600px; /* Maximale Breite */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stärkerer Schatten */
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="url"],
+        .modal-content input[type="color"],
+        .modal-content select,
+        .modal-content input[type="file"],
+        .modal-content input[type="number"] { /* Auch für den Dateiauswahl-Input und Number Input */
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #4a5568; /* Dunklerer Rand */
+            border-radius: 0.375rem;
+            background-color: #4a5568; /* Dunkler Hintergrund für Eingabefelder */
+            color: white;
+        }
+
+        .modal-content input[type="file"] {
+            padding: 0.5rem; /* Etwas weniger Padding für Dateiauswahl */
+        }
+
+        .modal-content button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Stil für die Suchleiste */
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px; /* Pillenform */
+            border: 1px solid #4a5568;
+            background-color: #2d3748;
+            color: white;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar input::placeholder {
+            color: #a0aec0;
+        }
+
+        /* Neue Stile für Einstellungskategorien und Untermenüs */
+        .settings-category-button {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #4A5568; /* Dunkleres Grau */
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-category-button:hover {
+            background-color: #636B7A; /* Noch dunkleres Grau beim Hover */
+        }
+
+        .settings-submenu {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .back-to-main-menu-button {
+            background-color: #6B7280;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            align-self: flex-start;
+        }
+
+        .back-to-main-menu-button:hover {
+            background-color: #8D94A0;
+        }
+
+        /* Stile für den Einstellungs-Button */
+        #settingsButton {
+            position: fixed;
+            z-index: 50; /* Sicherstellen, dass er über anderem Inhalt liegt, aber unter dem Modal */
+        }
+
+        .settings-button-top-left { top: 1rem; left: 1rem; right: auto; bottom: auto; }
+        .settings-button-top-right { top: 1rem; right: 1rem; left: auto; bottom: auto; }
+        .settings-button-bottom-left { bottom: 1rem; left: 1rem; right: auto; top: auto; }
+        .settings-button-bottom-right { bottom: 1rem; right: 1rem; left: auto; top: auto; }
+
+        /* Stil für den reinen Icon-Button */
+        #settingsButton.icon-only {
+            width: 50px; /* Angepasste Größe für Icon */
+            height: 50px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem; /* Größe des Icons */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+
+    <div class="flex-grow flex flex-col items-center justify-center p-4" id="mainContentWrapper">
+        <h1 id="pageTitle" class="text-4xl font-bold mb-8 text-center">Willkommen auf deiner Startseite</h1>
+
+        <div id="searchBarContainer" class="search-bar flex items-center gap-2">
+            <input type="search" id="googleSearchInput" placeholder="Suche mit Google..." class="focus:ring-2 focus:ring-blue-500 flex-grow">
+            <select id="quickSearchProviderSelect" class="bg-gray-700 text-white p-2 rounded-full border border-gray-600 focus:ring-2 focus:ring-blue-500">
+                <option value="google">Google</option>
+                <option value="bing">Bing</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="ecosia">Ecosia</option>
+                <option value="wikipedia">Wikipedia</option>
+            </select>
+        </div>
+
+        <div id="tilesContainer" class="tiles-grid">
+            </div>
+
+        <button id="settingsButton" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out">
+            Einstellungen
+        </button>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-6 text-center" id="modalTitle">Einstellungen anpassen</h2>
+
+            <div id="mainSettingsMenu" class="settings-submenu">
+                <button id="openBackgroundSettings" class="settings-category-button">
+                    Hintergrund Einstellungen
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openPageTitleSettings" class="settings-category-button">
+                    Seiten-Titel Einstellungen
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openSearchBarSettings" class="settings-category-button">
+                    Suchleiste Einstellungen
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openGridSettings" class="settings-category-button">
+                    Raster-Einstellungen
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openButtonManagement" class="settings-category-button">
+                    Buttons verwalten
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openSettingsButtonSettings" class="settings-category-button">
+                    Einstellungen Button
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openBackupRestoreSettings" class="settings-category-button">
+                    Daten sichern/wiederherstellen
+                    <span class="ml-2">></span>
+                </button>
+            </div>
+
+            <div id="backgroundSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Hintergrund Einstellungen</h3>
+                <div class="mb-4">
+                    <label for="backgroundTypeSelect" class="block text-sm font-medium mb-2">Hintergrundtyp:</label>
+                    <select id="backgroundTypeSelect">
+                        <option value="color">Einfarbiger Hintergrund</option>
+                        <option value="image">Bild Hintergrund</option>
+                        <option value="gradient">Farbverlauf Hintergrund</option>
+                    </select>
+                </div>
+
+                <div id="backgroundColorOptions" class="mb-4">
+                    <label for="bgColorPicker" class="block text-sm font-medium mb-2">Hintergrundfarbe:</label>
+                    <input type="color" id="bgColorPicker" class="h-10 w-full p-0 border-none cursor-pointer">
+                </div>
+
+                <div id="backgroundImageOptions" class="hidden">
+                    <div class="mb-4">
+                        <label for="backgroundImageFile" class="block text-sm font-medium mb-2">Bild vom PC auswählen:</label>
+                        <input type="file" id="backgroundImageFile" accept="image/*" class="mb-2">
+                    </div>
+                    <div class="mb-4">
+                        <label for="backgroundImageUrl" class="block text-sm font-medium mb-2">Bildlink (URL):</label>
+                        <input type="url" id="backgroundImageUrl" placeholder="https://example.com/background.jpg">
+                    </div>
+                    <img id="currentBackgroundPreview" src="" alt="Hintergrundbild Vorschau" class="w-full h-32 object-cover rounded-md border border-gray-600 mb-4">
+                </div>
+
+                <div id="backgroundGradientOptions" class="hidden">
+                    <div class="mb-4">
+                        <label for="gradientColor1" class="block text-sm font-medium mb-2">Verlaufsfarbe 1:</label>
+                        <input type="color" id="gradientColor1" class="h-10 w-full p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="mb-4">
+                        <label for="gradientColor2" class="block text-sm font-medium mb-2">Verlaufsfarbe 2:</label>
+                        <input type="color" id="gradientColor2" class="h-10 w-full p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="mb-4">
+                        <label for="gradientDirection" class="block text-sm font-medium mb-2">Verlaufsrichtung:</label>
+                        <select id="gradientDirection">
+                            <option value="to right">Nach rechts</option>
+                            <option value="to bottom">Nach unten</option>
+                            <option value="to bottom right">Nach unten rechts</option>
+                            <option value="to bottom left">Nach unten links</option>
+                            <option value="to top">Nach oben</option>
+                            <option value="to top right">Nach oben rechts</option>
+                            <option value="to top left">Nach oben links</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pageTitleSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Seiten-Titel Einstellungen</h3>
+                <div class="mb-4">
+                    <label for="pageTitleInput" class="block text-sm font-medium mb-2">Titel der Seite:</label>
+                    <input type="text" id="pageTitleInput" placeholder="Dein Seiten-Titel">
+                </div>
+                <div class="mb-4">
+                    <label for="pageTitleFontSelect" class="block text-sm font-medium mb-2">Schriftart des Titels:</label>
+                    <select id="pageTitleFontSelect"></select>
+                </div>
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" id="hidePageTitleCheckbox" class="mr-2 h-4 w-4 text-blue-600 rounded">
+                    <label for="hidePageTitleCheckbox" class="text-sm font-medium">Seiten-Titel ausblenden</label>
+                </div>
+                <div class="mb-4">
+                    <label for="tabTitleInput" class="block text-sm font-medium mb-2">Titel der Tableiste:</label>
+                    <input type="text" id="tabTitleInput" placeholder="Titel des Browser-Tabs">
+                </div>
+                <div class="mb-4">
+                    <label for="faviconFileInput" class="block text-sm font-medium mb-2">Favicon auswählen (.ico, .png, .gif):</label>
+                    <input type="file" id="faviconFileInput" accept=".ico,image/png,image/gif" class="mb-2">
+                    <img id="faviconPreview" src="" alt="Favicon Vorschau" class="w-10 h-10 object-contain rounded-md border border-gray-600">
+                </div>
+            </div>
+
+            <div id="searchBarSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Suchleiste Einstellungen</h3>
+                <div class="mb-4">
+                    <label for="searchProviderSelect" class="block text-sm font-medium mb-2">Standardsuchanbieter:</label>
+                    <select id="searchProviderSelect">
+                        <option value="google">Google</option>
+                        <option value="bing">Bing</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
+                        <option value="ecosia">Ecosia</option>
+                        <option value="wikipedia">Wikipedia</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="gridSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Raster-Einstellungen</h3>
+                <div class="mb-4">
+                    <label for="maxColumnsInput" class="block text-sm font-medium mb-2">Maximale Spalten:</label>
+                    <input type="number" id="maxColumnsInput" min="1" value="6">
+                </div>
+                <div class="mb-4">
+                    <label for="baseTileHeightInput" class="block text-sm font-medium mb-2">Grundhöhe der Kachel (1x1 in px):</label>
+                    <input type="number" id="baseTileHeightInput" min="50" value="150">
+                </div>
+            </div>
+
+            <div id="buttonManagementSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Buttons verwalten</h3>
+                <div class="flex justify-between gap-4 mb-4">
+                    <button id="addButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex-grow">Button hinzufügen</button>
+                    <button id="removeButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex-grow">Ausgewählten Button entfernen</button>
+                </div>
+                <div class="mb-4">
+                    <label for="buttonSelect" class="block text-sm font-medium mb-2">Button zum Bearbeiten auswählen:</label>
+                    <select id="buttonSelect">
+                        </select>
+                </div>
+                <div id="buttonEditForm" class="hidden">
+                    <div class="mb-4">
+                        <label for="buttonTitle" class="block text-sm font-medium mb-2">
+                            Titel: <span class="text-gray-400 text-sm">(wird ausgeblendet, wenn Bild vorhanden)</span>
+                        </label>
+                        <input type="text" id="buttonTitle" placeholder="Button Titel">
+                    </div>
+
+                    <div id="buttonUrlOptions" class="mb-4">
+                        <label for="buttonLink" class="block text-sm font-medium mb-2">Verlinkung (URL):</label>
+                        <input type="url" id="buttonLink" placeholder="https://example.com">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="buttonTarget" class="block text-sm font-medium mb-2">Link-Ziel:</label>
+                        <select id="buttonTarget">
+                            <option value="_self">Im selben Tab öffnen</option>
+                            <option value="_blank">In neuem Tab öffnen</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="buttonImage" class="block text-sm font-medium mb-2">Bild/Icon (Datei auswählen):</label>
+                        <input type="file" id="buttonImage" accept="image/*" class="mb-2">
+                        <img id="currentButtonImagePreview" src="" alt="Aktuelles Icon" class="w-20 h-20 object-contain rounded-md border border-gray-600">
+                        <button id="clearButtonImage" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md mt-2">Bild löschen</button>
+                    </div>
+                    <div class="mb-4">
+                        <label for="buttonColor" class="block text-sm font-medium mb-2">Button Farbe:</label>
+                        <input type="color" id="buttonColor" class="h-10 w-full p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="mb-4">
+                        <label for="buttonSize" class="block text-sm font-medium mb-2">Button Größe:</label>
+                        <select id="buttonSize">
+                            <option value="1x1">Standard (1x1)</option>
+                            <option value="2x1">Breit (2x1)</option>
+                            <option value="1x2">Hoch (1x2)</option>
+                            <option value="2x2">Groß (2x2)</option>
+                            <option value="3x1">Sehr Breit (3x1)</option>
+                            <option value="1x3">Sehr Hoch (1x3)</option>
+                        </select>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="settingsButtonSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Einstellungen Button</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Position:</label>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonPosition" value="top-left" class="form-radio text-blue-600" id="btnPosTL">
+                            <span class="ml-2">Oben Links</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonPosition" value="top-right" class="form-radio text-blue-600" id="btnPosTR">
+                            <span class="ml-2">Oben Rechts</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonPosition" value="bottom-left" class="form-radio text-blue-600" id="btnPosBL">
+                            <span class="ml-2">Unten Links</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonPosition" value="bottom-right" class="form-radio text-blue-600" id="btnPosBR">
+                            <span class="ml-2">Unten Rechts</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Anzeige:</label>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonDisplay" value="text" class="form-radio text-blue-600" id="btnDisplayTxt">
+                            <span class="ml-2">Text</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="settingsButtonDisplay" value="icon" class="form-radio text-blue-600" id="btnDisplayIcon">
+                            <span class="ml-2">Zahnradsymbol</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="backupRestoreSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button">Zurück</button>
+                <h3 class="text-xl font-semibold mb-3">Daten sichern/wiederherstellen</h3>
+                <div class="mb-4">
+                    <button id="exportSettingsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md w-full mb-2">Einstellungen exportieren</button>
+                </div>
+                <div class="mb-4">
+                    <label for="importSettingsFile" class="block text-sm font-medium mb-2">Einstellungen importieren (JSON-Datei):</label>
+                    <input type="file" id="importSettingsFile" accept=".json" class="mb-2">
+                    <button id="importSettingsButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md w-full">Importieren</button>
+                </div>
+                <div class="mb-4">
+                    <button id="resetSettingsButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md w-full">Auf Ursprungszustand zurücksetzen</button>
+                </div>
+                <div id="importMessage" class="text-sm text-red-400 mt-2"></div>
+            </div>
+
+
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="cancelSettings" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Abbrechen</button>
+                <button id="saveSettings" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4 text-center" id="confirmationMessage"></h3>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="confirmNoButton" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Nein</button>
+                <button id="confirmYesButton" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Ja</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verfügbare Schriftarten
+        const availableFonts = [
+            { name: 'Inter', value: 'Inter, sans-serif' },
+            { name: 'Arial', value: 'Arial, sans-serif' },
+            { name: 'Verdana', value: 'Verdana, sans-serif' },
+            { name: 'Georgia', value: 'Georgia, serif' },
+            { name: 'Times New Roman', value: '"Times New Roman", serif' },
+            { name: 'Courier New', value: '"Courier New", monospace' }
+        ];
+
+        // Standard-Buttons, wenn noch keine Einstellungen gespeichert sind (12x 1x1)
+        const defaultButtons = [
+            { id: 'btn1', title: 'Google', link: 'https://www.google.com', image: 'https://placehold.co/80x80/4285F4/FFFFFF?text=G', color: '#4285F4', size: '1x1', target: '_self' },
+            { id: 'btn2', title: 'YouTube', link: 'https://www.youtube.com', image: 'https://placehold.co/80x80/FF0000/FFFFFF?text=YT', color: '#FF0000', size: '1x1', target: '_self' },
+            { id: 'btn3', title: 'Wikipedia', link: 'https://www.wikipedia.org', image: 'https://placehold.co/80x80/000000/FFFFFF?text=W', color: '#000000', size: '1x1', target: '_self' },
+            { id: 'btn4', title: 'GitHub', link: 'https://github.com', image: 'https://placehold.co/80x80/181717/FFFFFF?text=GH', color: '#181717', size: '1x1', target: '_self' },
+            { id: 'btn5', title: 'Nachrichten', link: 'https://news.google.com', image: 'https://placehold.co/80x80/34A853/FFFFFF?text=News', color: '#34A853', size: '1x1', target: '_self' },
+            { id: 'btn6', title: 'E-Mail', link: 'https://mail.google.com', image: 'https://placehold.co/80x80/EA4335/FFFFFF?text=Mail', color: '#EA4335', size: '1x1', target: '_self' },
+            { id: 'btn7', title: 'Spotify', link: 'https://open.spotify.com', image: 'https://placehold.co/80x80/1DB954/FFFFFF?text=S', color: '#1DB954', size: '1x1', target: '_self' },
+            { id: 'btn8', title: 'Amazon', link: 'https://www.amazon.de', image: 'https://placehold.co/80x80/FF9900/FFFFFF?text=A', color: '#FF9900', size: '1x1', target: '_self' },
+            { id: 'btn9', title: 'Twitter/X', link: 'https://twitter.com', image: 'https://placehold.co/80x80/000000/FFFFFF?text=X', color: '#000000', size: '1x1', target: '_self' },
+            { id: 'btn10', title: 'LinkedIn', link: 'https://www.linkedin.com', image: 'https://placehold.co/80x80/0A66C2/FFFFFF?text=LI', color: '#0A66C2', size: '1x1', target: '_self' },
+            { id: 'btn11', title: 'Reddit', link: 'https://www.reddit.com', image: 'https://placehold.co/80x80/FF4500/FFFFFF?text=R', color: '#FF4500', size: '1x1', target: '_self' },
+            { id: 'btn12', title: 'ChatGPT', link: 'https://chat.openai.com', image: 'https://placehold.co/80x80/10A37F/FFFFFF?text=AI', color: '#10A37F', size: '1x1', target: '_self' }
+        ];
+
+        // Suchanbieter-URLs
+        const searchProviders = {
+            google: 'https://www.google.com/search?q=',
+            bing: 'https://www.bing.com/search?q=',
+            duckduckgo: 'https://www.duckduckgo.com/?q=',
+            ecosia: 'https://www.ecosia.org/search?q=',
+            wikipedia: 'https://de.wikipedia.org/wiki/Spezial:Suche?search=' // Wikipedia-Such-URL
+        };
+
+        // Such-Placeholder-Texte
+        const searchPlaceholders = {
+            google: 'Suche mit Google...',
+            bing: 'Suche mit Bing...',
+            duckduckgo: 'Suche mit DuckDuckGo...',
+            ecosia: 'Suche mit Ecosia...',
+            wikipedia: 'Suche mit Wikipedia...' // Wikipedia-Placeholder
+        };
+
+        // Referenzen zu DOM-Elementen
+        const body = document.body;
+        const mainContentWrapper = document.getElementById('mainContentWrapper');
+        const pageTitleElement = document.getElementById('pageTitle');
+        const tilesContainer = document.getElementById('tilesContainer');
+        const settingsButton = document.getElementById('settingsButton');
+        const settingsModal = document.getElementById('settingsModal');
+        const cancelSettingsButton = document.getElementById('cancelSettings');
+        const saveSettingsButton = document.getElementById('saveSettings');
+        const buttonSelect = document.getElementById('buttonSelect');
+        const buttonEditForm = document.getElementById('buttonEditForm');
+        const buttonTitleInput = document.getElementById('buttonTitle');
+        const buttonLinkInput = document.getElementById('buttonLink');
+        const buttonTargetSelect = document.getElementById('buttonTarget'); // Neuer Button
+        const buttonImageInput = document.getElementById('buttonImage');
+        const clearButtonImage = document.getElementById('clearButtonImage'); // Neuer Button
+        const buttonColorInput = document.getElementById('buttonColor');
+        const buttonSizeSelect = document.getElementById('buttonSize');
+        const googleSearchInput = document.getElementById('googleSearchInput');
+        const quickSearchProviderSelect = document.getElementById('quickSearchProviderSelect');
+        const currentButtonImagePreview = document.getElementById('currentButtonImagePreview');
+        const faviconLink = document.getElementById('faviconLink'); // Referenz zum Favicon-Link-Tag
+        const faviconFileInput = document.getElementById('faviconFileInput'); // Favicon-Dateiauswahl
+        const faviconPreview = document.getElementById('faviconPreview'); // Favicon-Vorschau
+
+        // Neue DOM-Elemente für Einstellungen
+        const pageTitleInput = document.getElementById('pageTitleInput');
+        const hidePageTitleCheckbox = document.getElementById('hidePageTitleCheckbox');
+        const tabTitleInput = document.getElementById('tabTitleInput'); // Neues Element für Tab-Titel
+        const searchProviderSelect = document.getElementById('searchProviderSelect');
+        const addButton = document.getElementById('addButton');
+        const removeButton = document.getElementById('removeButton');
+        const searchBarContainer = document.getElementById('searchBarContainer');
+
+        // Hintergrund-Elemente
+        const backgroundTypeSelect = document.getElementById('backgroundTypeSelect');
+        const backgroundColorOptions = document.getElementById('backgroundColorOptions');
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const backgroundImageOptions = document.getElementById('backgroundImageOptions');
+        const backgroundImageFile = document.getElementById('backgroundImageFile');
+        const backgroundImageUrl = document.getElementById('backgroundImageUrl');
+        const currentBackgroundPreview = document.getElementById('currentBackgroundPreview');
+        const backgroundGradientOptions = document.getElementById('backgroundGradientOptions');
+        const gradientColor1 = document.getElementById('gradientColor1');
+        const gradientColor2 = document.getElementById('gradientColor2');
+        const gradientDirection = document.getElementById('gradientDirection');
+
+        // Neue Elemente für Schriftart-Einstellungen
+        const pageTitleFontSelect = document.getElementById('pageTitleFontSelect');
+
+        // Neue Elemente für Raster-Einstellungen
+        const maxColumnsInput = document.getElementById('maxColumnsInput');
+        const baseTileHeightInput = document.getElementById('baseTileHeightInput');
+
+        // Neue DOM-Elemente für Menü-Navigation
+        const mainSettingsMenu = document.getElementById('mainSettingsMenu');
+        const backgroundSettingsSubmenu = document.getElementById('backgroundSettingsSubmenu');
+        const pageTitleSettingsSubmenu = document.getElementById('pageTitleSettingsSubmenu');
+        const searchBarSettingsSubmenu = document.getElementById('searchBarSettingsSubmenu');
+        const gridSettingsSubmenu = document.getElementById('gridSettingsSubmenu');
+        const buttonManagementSubmenu = document.getElementById('buttonManagementSubmenu');
+        const settingsButtonSettingsSubmenu = document.getElementById('settingsButtonSettingsSubmenu');
+        const backupRestoreSettingsSubmenu = document.getElementById('backupRestoreSettingsSubmenu'); // NEU: Backup/Restore Submenu
+
+        const openBackgroundSettingsButton = document.getElementById('openBackgroundSettings');
+        const openPageTitleSettingsButton = document.getElementById('openPageTitleSettings');
+        const openSearchBarSettingsButton = document.getElementById('openSearchBarSettings');
+        const openGridSettingsButton = document.getElementById('openGridSettings');
+        const openButtonManagementButton = document.getElementById('openButtonManagement');
+        const openSettingsButtonSettingsButton = document.getElementById('openSettingsButtonSettings');
+        const openBackupRestoreSettingsButton = document.getElementById('openBackupRestoreSettings'); // NEU: Open Backup/Restore Button
+
+        const backToMainMenuButtons = document.querySelectorAll('.back-to-main-menu-button');
+
+        // Neue DOM-Elemente für Einstellungs-Button-Einstellungen
+        const settingsButtonPositionRadios = document.querySelectorAll('input[name="settingsButtonPosition"]');
+        const settingsButtonDisplayRadios = document.querySelectorAll('input[name="settingsButtonDisplay"]');
+
+        // NEU: Elemente für Export/Import
+        const exportSettingsButton = document.getElementById('exportSettingsButton');
+        const importSettingsFile = document.getElementById('importSettingsFile');
+        const importSettingsButton = document.getElementById('importSettingsButton');
+        const importMessage = document.getElementById('importMessage');
+        const resetSettingsButton = document.getElementById('resetSettingsButton'); // NEU: Reset Button
+
+        // NEU: Elemente für Bestätigungs-Modal
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmYesButton = document.getElementById('confirmYesButton');
+        const confirmNoButton = document.getElementById('confirmNoButton');
+
+
+        let currentButtons = []; // Aktueller Zustand der Buttons
+        let currentBackgroundColor = '#1a202c'; // Aktuelle Hintergrundfarbe (Standard: Tailwind gray-900)
+        let currentPageTitle = 'Willkommen auf deiner Startseite';
+        let hidePageTitle = false;
+        let currentTabTitle = 'Meine Startseite'; // Neuer Zustand für Tab-Titel
+        let currentDefaultSearchProvider = 'google'; // Standardsuchanbieter aus den Einstellungen
+        let currentActiveSearchProvider = 'google'; // Aktuell ausgewählter Suchanbieter in der Schnellauswahl
+        let currentFaviconBase64 = ''; // Favicon als Base64-String
+        let selectedFileBase64 = null; // Temporäre Variable für die ausgewählte Datei für Button-Icons
+
+
+        // Neue Variablen für Hintergrund
+        let currentBackgroundType = 'color'; // 'color', 'image', 'gradient'
+        let currentBackgroundImageUrl = '';
+        let currentBackgroundImageBase64 = '';
+        let currentGradientColor1 = '#4F46E5'; // Standard-Gradientenfarben
+        let currentGradientColor2 = '#EC4899';
+        let currentGradientDirection = 'to right';
+
+        // Neue Variable für Schriftart des Seitentitels
+        let currentPageTitleFont = 'Inter, sans-serif';
+
+        // Neue Variablen für Raster-Einstellungen
+        let currentMaxColumns = 6;
+        let currentBaseTileHeight = 150;
+
+        // Neue Variablen für Einstellungs-Button
+        let currentSettingsButtonPosition = 'bottom-right'; // Standardposition
+        let currentSettingsButtonDisplay = 'text'; // Standardanzeige: Text
+
+
+        // Funktion zum Laden der Einstellungen aus dem Local Storage
+        function loadSettings() {
+            try {
+                const storedButtons = localStorage.getItem('browserStartPageButtons');
+                const storedBgColor = localStorage.getItem('browserStartPageBgColor');
+                const storedPageTitle = localStorage.getItem('browserStartPageTitle');
+                const storedHidePageTitle = localStorage.getItem('browserStartPageHideTitle');
+                const storedTabTitle = localStorage.getItem('browserStartPageTabTitle'); // Lade Tab-Titel
+                const storedDefaultSearchProvider = localStorage.getItem('browserStartPageSearchProvider'); // Lade Standardsuchanbieter
+                const storedBackgroundType = localStorage.getItem('browserStartPageBackgroundType');
+                const storedBackgroundImageUrl = localStorage.getItem('browserStartPageBackgroundImageUrl');
+                const storedBackgroundImageBase64 = localStorage.getItem('browserStartPageBackgroundImageBase64');
+                const storedGradientColor1 = localStorage.getItem('browserStartPageGradientColor1');
+                const storedGradientColor2 = localStorage.getItem('browserStartPageGradientColor2');
+                const storedGradientDirection = localStorage.getItem('browserStartPageGradientGradientDirection');
+                const storedPageTitleFont = localStorage.getItem('browserStartPageTitleFont');
+                const storedMaxColumns = localStorage.getItem('browserStartPageMaxColumns');
+                const storedBaseTileHeight = localStorage.getItem('browserStartPageBaseTileHeight');
+                const storedSettingsButtonPosition = localStorage.getItem('browserStartPageSettingsButtonPosition');
+                const storedSettingsButtonDisplay = localStorage.getItem('browserStartPageSettingsButtonDisplay');
+                const storedFaviconBase64 = localStorage.getItem('browserStartPageFavicon'); // Favicon laden
+
+
+                currentButtons = storedButtons ? JSON.parse(storedButtons) : JSON.parse(JSON.stringify(defaultButtons)); // Deep copy default buttons
+                currentBackgroundColor = storedBgColor || '#1a202c';
+                currentPageTitle = storedPageTitle !== null ? storedPageTitle : 'Willkommen auf deiner Startseite';
+                hidePageTitle = storedHidePageTitle === 'true'; // Convert string to boolean
+                currentTabTitle = storedTabTitle !== null ? storedTabTitle : 'Meine Startseite'; // Setze Tab-Titel
+                currentDefaultSearchProvider = storedDefaultSearchProvider || 'google'; // Setze Standardsuchanbieter
+                currentActiveSearchProvider = currentDefaultSearchProvider; // Aktiver Suchanbieter ist standardmäßig der Standardsuchanbieter
+                currentFaviconBase64 = storedFaviconBase64 || ''; // Favicon laden
+
+                // Hintergrund-Einstellungen laden
+                currentBackgroundType = storedBackgroundType || 'color';
+                currentBackgroundImageUrl = storedBackgroundImageUrl || '';
+                currentBackgroundImageBase64 = ''; // Base64-Zustand zurücksetzen, wenn URL vorhanden
+                if (storedBackgroundImageBase64) {
+                    currentBackgroundImageBase64 = storedBackgroundImageBase64;
+                } else if (storedBackgroundImageUrl) {
+                    currentBackgroundImageUrl = storedBackgroundImageUrl;
+                }
+
+                currentGradientColor1 = storedGradientColor1 || '#4F46E5';
+                currentGradientColor2 = storedGradientColor2 || '#EC4899';
+                currentGradientDirection = storedGradientDirection || 'to right';
+
+                // Seitentitel-Schriftart laden
+                currentPageTitleFont = storedPageTitleFont || 'Inter, sans-serif';
+
+                // Raster-Einstellungen laden
+                currentMaxColumns = parseInt(storedMaxColumns) || 6;
+                currentBaseTileHeight = parseInt(storedBaseTileHeight) || 150;
+
+                // Einstellungs-Button-Einstellungen laden
+                currentSettingsButtonPosition = storedSettingsButtonPosition || 'bottom-right';
+                currentSettingsButtonDisplay = storedSettingsButtonDisplay || 'text';
+
+                // Setze den Wert des Quick-Selects auf den aktuellen aktiven Suchanbieter
+                quickSearchProviderSelect.value = currentActiveSearchProvider;
+                // Setze den Placeholder der Suchleiste beim Laden der Seite
+                googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+
+
+                // Sicherstellen, dass die Button-IDs eindeutig sind und ggf. neue generieren
+                currentButtons = currentButtons.map(btn => ({
+                    ...btn,
+                    id: btn.id || 'btn' + Math.random().toString(36).substr(2, 9),
+                    size: btn.size || '1x1', // Standardgröße, falls nicht vorhanden
+                    target: btn.target || '_self', // Standard-Link-Ziel, falls nicht vorhanden
+                }));
+
+                // Wenn keine Buttons vorhanden sind, füge Standard-Buttons hinzu
+                if (currentButtons.length === 0) {
+                    currentButtons = JSON.parse(JSON.stringify(defaultButtons)); // Deep copy
+                }
+
+            } catch (e) {
+                console.error("Fehler beim Laden der Einstellungen aus Local Storage:", e);
+                currentButtons = JSON.parse(JSON.stringify(defaultButtons));
+                currentBackgroundColor = '#1a202c';
+                currentPageTitle = 'Willkommen auf deiner Startseite';
+                hidePageTitle = false;
+                currentTabTitle = 'Meine Startseite';
+                currentDefaultSearchProvider = 'google';
+                currentActiveSearchProvider = 'google';
+                currentFaviconBase64 = '';
+                currentBackgroundType = 'color';
+                currentBackgroundImageUrl = '';
+                currentBackgroundImageBase64 = '';
+                currentGradientColor1 = '#4F46E5';
+                currentGradientColor2 = '#EC4899';
+                currentGradientDirection = 'to right';
+                currentPageTitleFont = 'Inter, sans-serif';
+                currentMaxColumns = 6;
+                currentBaseTileHeight = 150;
+                currentSettingsButtonPosition = 'bottom-right';
+                currentSettingsButtonDisplay = 'text';
+            }
+        }
+
+        // Funktion zum Speichern der Einstellungen im Local Storage
+        function saveSettings() {
+            try {
+                localStorage.setItem('browserStartPageButtons', JSON.stringify(currentButtons));
+                localStorage.setItem('browserStartPageBgColor', currentBackgroundColor);
+                localStorage.setItem('browserStartPageTitle', currentPageTitle);
+                localStorage.setItem('browserStartPageHideTitle', hidePageTitle);
+                localStorage.setItem('browserStartPageTabTitle', currentTabTitle); // Speichere Tab-Titel
+                localStorage.setItem('browserStartPageSearchProvider', currentDefaultSearchProvider); // Speichere Standardsuchanbieter
+                localStorage.setItem('browserStartPageFavicon', currentFaviconBase64); // Favicon speichern
+
+                // Hintergrund-Einstellungen speichern
+                localStorage.setItem('browserStartPageBackgroundType', currentBackgroundType);
+                localStorage.setItem('browserStartPageBackgroundImageUrl', currentBackgroundImageUrl);
+                localStorage.setItem('browserStartPageBackgroundImageBase64', currentBackgroundImageBase64);
+                localStorage.setItem('browserStartPageGradientColor1', currentGradientColor1);
+                localStorage.setItem('browserStartPageGradientColor2', currentGradientColor2);
+                localStorage.setItem('browserStartPageGradientDirection', currentGradientDirection);
+
+                // Seitentitel-Schriftart speichern
+                localStorage.setItem('browserStartPageTitleFont', currentPageTitleFont);
+
+                // Raster-Einstellungen speichern
+                localStorage.setItem('browserStartPageMaxColumns', currentMaxColumns);
+                localStorage.setItem('browserStartPageBaseTileHeight', currentBaseTileHeight);
+
+                // Einstellungs-Button-Einstellungen speichern
+                localStorage.setItem('browserStartPageSettingsButtonPosition', currentSettingsButtonPosition);
+                localStorage.setItem('browserStartPageSettingsButtonDisplay', currentSettingsButtonDisplay);
+
+            } catch (e) {
+                console.error("Fehler beim Speichern der Einstellungen im Local Storage:", e);
+            }
+        }
+
+        // Funktion zum Rendern der Buttons auf der Seite
+        function renderButtons() {
+            tilesContainer.innerHTML = ''; // Vorhandene Buttons entfernen
+            currentButtons.forEach(button => {
+                const tile = document.createElement('a'); // Verwende <a> für Verlinkungen
+                tile.href = button.link;
+                tile.target = button.target || '_self'; // Setze das Link-Ziel
+                tile.className = `tile hover:scale-105 hover:shadow-lg rounded-xl`;
+                tile.setAttribute('data-id', button.id); // Speichert die ID für die Bearbeitung
+                tile.setAttribute('data-size', button.size); // Setzt die Größe für CSS-Styling
+
+                // Setze die Hintergrundfarbe des Buttons immer
+                tile.style.backgroundColor = button.color;
+
+                const img = document.createElement('img');
+                img.src = button.image;
+                img.alt = button.title + ' Icon';
+
+                const title = document.createElement('h3');
+                title.textContent = button.title;
+                title.classList.add('hidden'); // Titel standardmäßig verstecken
+
+                // Füge Bild und Titel zum Button hinzu
+                tile.appendChild(img);
+                tile.appendChild(title);
+
+                // Überprüfe, ob ein gültiges Bild vorhanden ist
+                const isPlaceholderImage = !button.image ||
+                                           button.image.includes('placehold.co/80x80/6B7280/FFFFFF?text=Icon') ||
+                                           button.image.includes('placehold.co/80x80/6B7280/FFFFFF?text=Neu');
+
+                if (isPlaceholderImage) {
+                    // Wenn kein echtes Bild vorhanden ist, zeige den Titel und entferne das img-Element
+                    title.classList.remove('hidden');
+                    img.remove(); // Entferne das img-Element, da es nicht benötigt wird
+                } else {
+                    // Wenn ein Bild vorhanden ist, versuche es zu laden
+                    img.onload = () => {
+                        // Bild erfolgreich geladen, Titel bleibt versteckt
+                        title.classList.add('hidden');
+                    };
+                    img.onerror = function() {
+                        // Bild konnte nicht geladen werden, zeige den Titel und entferne das img-Element
+                        this.remove(); // Entferne das img-Lement
+                        title.classList.remove('hidden'); // Zeige den Titel an
+                    };
+                }
+
+                tilesContainer.appendChild(tile);
+            });
+        }
+
+        // Funktion zum Anwenden der Seiten-Titel Einstellungen
+        function applyPageTitleSettings() {
+            pageTitleElement.textContent = currentPageTitle;
+            pageTitleElement.style.fontFamily = currentPageTitleFont; // Schriftart des Titels anwenden
+            pageTitleElement.style.textShadow = '0 0 5px rgba(0,0,0,0.7)'; // Halbschatten für den Titel
+            if (hidePageTitle) {
+                pageTitleElement.classList.add('hidden');
+            } else {
+                pageTitleElement.classList.remove('hidden');
+            }
+        }
+
+        // Funktion zum Anwenden des Tab-Titels
+        function applyTabTitleSettings() {
+            document.title = currentTabTitle;
+        }
+
+        // Funktion zum Anwenden der Suchleisten-Position (simplified)
+        function applySearchPosition() {
+            // The main content wrapper is already flex-col and items-center justify-center.
+            // This ensures the title, search bar, and tiles grid are vertically centered as a block.
+            // No specific order or justify-content changes are needed here for the search bar itself,
+            // as its position within the main content flow is fixed (after title, before tiles).
+        }
+
+        // Funktion zum Anwenden der Hintergrund-Einstellungen
+        function applyBackgroundSettings() {
+            body.style.backgroundColor = ''; // CSS-Hintergrundfarbe zurücksetzen
+            body.style.backgroundImage = ''; // CSS-Hintergrundbild zurücksetzen
+
+            if (currentBackgroundType === 'color') {
+                body.style.backgroundColor = currentBackgroundColor;
+            } else if (currentBackgroundType === 'image') {
+                if (currentBackgroundImageBase64) {
+                    body.style.backgroundImage = `url(${currentBackgroundImageBase64})`;
+                } else if (currentBackgroundImageUrl) {
+                    body.style.backgroundImage = `url(${currentBackgroundImageUrl})`;
+                }
+            } else if (currentBackgroundType === 'gradient') {
+                body.style.backgroundImage = `linear-gradient(${currentGradientDirection}, ${currentGradientColor1}, ${currentGradientColor2})`;
+            }
+        }
+
+        // Funktion zum Anwenden der Raster-Einstellungen
+        function applyGridSettings() {
+            tilesContainer.style.setProperty('--max-cols', currentMaxColumns);
+
+            let maxRowOccupied = 0;
+            let currentRow = 0;
+            let currentColumn = 0;
+
+            currentButtons.forEach(button => {
+                const [width, height] = button.size.split('x').map(Number);
+
+                // Check if the button fits in the current row
+                if (currentColumn + width > currentMaxColumns) {
+                    // Move to the next row if it doesn't fit
+                    currentRow++;
+                    currentColumn = 0;
+                }
+
+                // Update maxRowOccupied based on the current button's height
+                maxRowOccupied = Math.max(maxRowOccupied, currentRow + height);
+
+                // Advance column for the next button
+                currentColumn += width;
+            });
+
+            // Add 1 to maxRowOccupied to ensure an extra row is always available, preventing scrollbar
+            const dynamicMaxRows = maxRowOccupied + 1;
+            tilesContainer.style.setProperty('--max-rows', dynamicMaxRows);
+
+            tilesContainer.style.setProperty('--base-tile-height', `${currentBaseTileHeight}px`);
+        }
+
+        // Funktion zum Anwenden der Einstellungs-Button-Einstellungen
+        function applySettingsButton() {
+            // Entferne alle Positions- und Anzeige-Klassen zuerst
+            settingsButton.classList.remove('settings-button-top-left', 'settings-button-top-right', 'settings-button-bottom-left', 'settings-button-bottom-right', 'icon-only');
+            settingsButton.style.top = ''; // CSS-Eigenschaften zurücksetzen
+            settingsButton.style.bottom = '';
+            settingsButton.style.left = '';
+            settingsButton.style.right = '';
+
+            // Position anwenden
+            settingsButton.classList.add(`settings-button-${currentSettingsButtonPosition}`);
+
+            // Anzeige-Typ anwenden
+            if (currentSettingsButtonDisplay === 'icon') {
+                settingsButton.innerHTML = '<i class="fas fa-cog"></i>'; // Font Awesome Zahnrad-Icon
+                settingsButton.classList.add('icon-only');
+            } else {
+                settingsButton.textContent = 'Einstellungen';
+            }
+        }
+
+        // Funktion zum Anwenden des Favicons
+        function applyFavicon() {
+            if (currentFaviconBase64) {
+                faviconLink.href = currentFaviconBase64;
+            } else {
+                faviconLink.href = ''; // Setze auf leer, wenn kein Favicon vorhanden
+            }
+        }
+
+        // Funktion zum Anzeigen des jeweiligen Menüs/Untermenüs im Modal
+        function showMenu(menuToShow) {
+            // Alle Menüs/Untermenüs ausblenden
+            mainSettingsMenu.classList.add('hidden');
+            backgroundSettingsSubmenu.classList.add('hidden');
+            pageTitleSettingsSubmenu.classList.add('hidden');
+            searchBarSettingsSubmenu.classList.add('hidden');
+            gridSettingsSubmenu.classList.add('hidden');
+            buttonManagementSubmenu.classList.add('hidden');
+            settingsButtonSettingsSubmenu.classList.add('hidden');
+            backupRestoreSettingsSubmenu.classList.add('hidden'); // NEU: Backup/Restore Submenu ausblenden
+
+            // Das gewünschte Menü anzeigen
+            document.getElementById(menuToShow).classList.remove('hidden');
+        }
+
+        // Funktion zum Öffnen des Einstellungs-Modals
+        function openSettingsModal() {
+            settingsModal.style.display = 'flex'; // Modal anzeigen
+            showMenu('mainSettingsMenu'); // Hauptmenü zuerst anzeigen
+
+            populateButtonSelect(); // Dropdown mit Buttons füllen
+            populateFontSelects(); // Schriftart-Dropdowns füllen
+
+            // Aktuelle Werte in die Formularfelder laden (für alle Submenüs, da sie beim Speichern/Abbrechen global angewendet werden)
+            bgColorPicker.value = currentBackgroundColor;
+            pageTitleInput.value = currentPageTitle;
+            hidePageTitleCheckbox.checked = hidePageTitle;
+            tabTitleInput.value = currentTabTitle; // Setze Tab-Titel im Input
+            searchProviderSelect.value = currentDefaultSearchProvider; // Setze Wert aus Standardsuchanbieter
+            pageTitleFontSelect.value = currentPageTitleFont; // Seitentitel-Schriftart setzen
+            faviconPreview.src = currentFaviconBase64; // Favicon-Vorschau setzen
+
+            // Hintergrund-Einstellungen im Modal setzen
+            backgroundTypeSelect.value = currentBackgroundType;
+            backgroundImageUrl.value = currentBackgroundImageUrl;
+            gradientColor1.value = gradientColor1.value;
+            gradientColor2.value = gradientColor2.value;
+            gradientDirection.value = gradientDirection.value;
+
+            // Raster-Einstellungen im Modal setzen
+            maxColumnsInput.value = currentMaxColumns;
+            baseTileHeightInput.value = currentBaseTileHeight;
+
+            // Einstellungs-Button-Einstellungen im Modal setzen
+            settingsButtonPositionRadios.forEach(radio => {
+                radio.checked = radio.value === currentSettingsButtonPosition;
+            });
+            settingsButtonDisplayRadios.forEach(radio => {
+                radio.checked = radio.value === currentSettingsButtonDisplay;
+            });
+
+
+            // Vorschau für Hintergrundbild setzen
+            if (currentBackgroundType === 'image') {
+                if (currentBackgroundImageBase64) {
+                    currentBackgroundPreview.src = currentBackgroundImageBase64;
+                } else if (currentBackgroundImageUrl) {
+                    currentBackgroundPreview.src = currentBackgroundImageUrl;
+                } else {
+                    currentBackgroundPreview.src = '';
+                }
+            } else {
+                currentBackgroundPreview.src = '';
+            }
+            // Temporären Base64-Zustand für Button-Icons zurücksetzen
+            selectedFileBase64 = null;
+
+            // Sichtbarkeit der Hintergrund-Optionen steuern
+            toggleBackgroundOptions();
+
+            // Formular für Button-Details ausblenden, da anfangs kein Button ausgewählt ist
+            buttonSelect.value = '';
+            buttonEditForm.classList.add('hidden');
+            currentButtonImagePreview.src = '';
+
+            // Import-Nachricht zurücksetzen
+            importMessage.textContent = '';
+            importSettingsFile.value = ''; // Dateiauswahl zurücksetzen
+        }
+
+        // Funktion zum Schließen des Einstellungs-Modals
+        function closeSettingsModal() {
+            settingsModal.style.display = 'none'; // Modal verstecken
+            // Alle Buttons im Einstellungs-Modal wieder aktivieren, wenn es geschlossen wird
+            cancelSettingsButton.disabled = false;
+            saveSettingsButton.disabled = false;
+            exportSettingsButton.disabled = false;
+            importSettingsButton.disabled = false;
+            importSettingsFile.disabled = false;
+            resetSettingsButton.disabled = false;
+            // Auch Import-Nachricht zurücksetzen
+            importMessage.textContent = '';
+            importMessage.style.color = ''; // Farbe zurücksetzen
+        }
+
+        // Funktion zum Füllen des Button-Auswahl-Dropdowns
+        function populateButtonSelect() {
+            buttonSelect.innerHTML = '<option value="">- Button auswählen -</option>'; // Standardoption
+            currentButtons.forEach((button) => {
+                const option = document.createElement('option');
+                option.value = button.id; // Verwende die ID als Wert
+                option.textContent = button.title;
+                buttonSelect.appendChild(option);
+            });
+        }
+
+        // Funktion zum Füllen der Schriftart-Dropdowns
+        function populateFontSelects() {
+            // Seitentitel-Schriftart
+            pageTitleFontSelect.innerHTML = '';
+            availableFonts.forEach(font => {
+                const option = document.createElement('option');
+                option.value = font.value;
+                option.textContent = font.name;
+                pageTitleFontSelect.appendChild(option);
+            });
+        }
+
+
+        // Funktion zur Steuerung der Sichtbarkeit der Hintergrund-Optionen
+        function toggleBackgroundOptions() {
+            const selectedType = backgroundTypeSelect.value;
+            backgroundColorOptions.classList.add('hidden');
+            backgroundImageOptions.classList.add('hidden');
+            backgroundGradientOptions.classList.add('hidden');
+
+            if (selectedType === 'color') {
+                backgroundColorOptions.classList.remove('hidden');
+            } else if (selectedType === 'image') {
+                backgroundImageOptions.classList.remove('hidden');
+            } else if (selectedType === 'gradient') {
+                backgroundGradientOptions.classList.remove('hidden');
+            }
+        }
+
+        // Event-Listener für die Auswahl des Hintergrundtyps
+        backgroundTypeSelect.addEventListener('change', toggleBackgroundOptions);
+
+        // Event-Listener für die Dateiauswahl des Hintergrundbildes
+        backgroundImageFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentBackgroundImageBase64 = e.target.result;
+                    currentBackgroundPreview.src = currentBackgroundImageBase64;
+                    backgroundImageUrl.value = ''; // URL-Feld leeren, wenn Datei ausgewählt
+                };
+                reader.readAsDataURL(file);
+            } else {
+                currentBackgroundImageBase64 = '';
+                // Wenn keine Datei ausgewählt ist, bleibt die Vorschau, wie sie war
+            }
+        });
+
+        // Event-Listener für die URL-Eingabe des Hintergrundbildes
+        backgroundImageUrl.addEventListener('input', () => {
+            currentBackgroundImageUrl = backgroundImageUrl.value;
+            currentBackgroundPreview.src = currentBackgroundImageUrl;
+            backgroundImageFile.value = ''; // Datei-Feld leeren, wenn URL eingegeben
+            currentBackgroundImageBase64 = ''; // Base64-Zustand zurücksetzen
+        });
+
+        // Event-Listener für die Dateiauswahl des Button-Icons
+        buttonImageInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedFileBase64 = e.target.result; // Speichert die Base64-Repräsentation
+                    currentButtonImagePreview.src = selectedFileBase64; // Zeigt die Vorschau an
+                };
+                reader.readAsDataURL(file);
+            } else {
+                selectedFileBase64 = null;
+                // Wenn keine Datei ausgewählt ist, bleibt die Vorschau, wie sie war
+            }
+        });
+
+        // Event-Listener für den "Bild löschen" Button
+        clearButtonImage.addEventListener('click', () => {
+            currentButtonImagePreview.src = ''; // Bildvorschau leeren
+            buttonImageInput.value = ''; // Dateiauswahl zurücksetzen
+            selectedFileBase64 = ''; // Temporären Zustand leeren
+        });
+
+        // Event-Listener für die Favicon-Dateiauswahl
+        faviconFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentFaviconBase64 = e.target.result;
+                    faviconPreview.src = currentFaviconBase64;
+                };
+            } else {
+                currentFaviconBase64 = '';
+                faviconPreview.src = '';
+            }
+        });
+
+        // Event-Listener für die Auswahl eines Buttons im Modal
+        buttonSelect.addEventListener('change', (event) => {
+            const selectedId = event.target.value;
+            if (selectedId) {
+                const selectedButton = currentButtons.find(btn => btn.id === selectedId);
+                if (selectedButton) {
+                    buttonTitleInput.value = selectedButton.title;
+                    buttonLinkInput.value = selectedButton.link;
+                    buttonColorInput.value = selectedButton.color;
+                    buttonSizeSelect.value = selectedButton.size; // Setzt die Größe im Dropdown
+                    buttonTargetSelect.value = selectedButton.target || '_self'; // Setzt das Link-Ziel im Dropdown
+
+                    // Dateieingabe für Bild zurücksetzen
+                    buttonImageInput.value = '';
+                    // Vorschau anzeigen
+                    currentButtonImagePreview.src = selectedButton.image;
+                    // Wichtig: Speichere das aktuelle Bild in selectedFileBase64,
+                    // damit es beim Speichern erhalten bleibt, wenn kein neues Bild ausgewählt wird.
+                    selectedFileBase64 = selectedButton.image;
+
+                    buttonEditForm.classList.remove('hidden'); // Formular anzeigen
+                }
+            } else {
+                buttonEditForm.classList.add('hidden'); // Formular ausblenden, wenn nichts ausgewählt ist
+                buttonImageInput.value = ''; // Datei-Input leeren
+                currentButtonImagePreview.src = ''; // Bildvorschau leeren
+                selectedFileBase64 = null; // Zurücksetzen, wenn kein Button ausgewählt ist
+            }
+        });
+
+        // Event-Listener für den "Button hinzufügen"-Button
+        addButton.addEventListener('click', () => {
+            const newId = 'btn' + Date.now(); // Eindeutige ID generieren
+            const newButton = {
+                id: newId,
+                title: 'Neuer Button',
+                link: 'https://www.example.com',
+                image: '', // Standardmäßig kein Bild
+                color: '#6B7280',
+                size: '1x1',
+                target: '_self', // Standard-Link-Ziel für neue Buttons
+            };
+            currentButtons.push(newButton);
+            populateButtonSelect(); // Dropdown aktualisieren
+            buttonSelect.value = newId; // Neuen Button auswählen
+            buttonSelect.dispatchEvent(new Event('change')); // Change-Event auslösen, um Formular zu füllen
+        });
+
+        // Event-Listener für den "Ausgewählten Button entfernen"-Button
+        removeButton.addEventListener('click', () => {
+            const selectedId = buttonSelect.value;
+            if (selectedId && currentButtons.length > 0) { // Erlaubt das Entfernen bis zum letzten Button
+                currentButtons = currentButtons.filter(btn => btn.id !== selectedId);
+                populateButtonSelect(); // Dropdown aktualisieren
+                buttonSelect.value = ''; // Auswahl zurücksetzen
+                buttonEditForm.classList.add('hidden'); // Formular ausblenden
+                currentButtonImagePreview.src = ''; // Bildvorschau leeren
+            } else if (currentButtons.length === 0) {
+                console.warn("Keine Buttons zum Entfernen vorhanden.");
+                // Hier könnte eine Benachrichtigung an den Benutzer angezeigt werden
+            }
+        });
+
+        // Event-Listener für den "Speichern"-Button im Modal
+        saveSettingsButton.addEventListener('click', () => {
+            const selectedId = buttonSelect.value;
+            if (selectedId) {
+                // Button-Details aktualisieren
+                const buttonIndex = currentButtons.findIndex(btn => btn.id === selectedId);
+                if (buttonIndex !== -1) {
+                    currentButtons[buttonIndex].title = buttonTitleInput.value;
+                    currentButtons[buttonIndex].link = buttonLinkInput.value;
+                    currentButtons[buttonIndex].color = buttonColorInput.value;
+                    currentButtons[buttonIndex].size = buttonSizeSelect.value; // Speichert die ausgewählte Größe
+                    currentButtons[buttonIndex].target = buttonTargetSelect.value; // Speichert das ausgewählte Link-Ziel
+
+                    // Bild aktualisieren: Verwende selectedFileBase64, das entweder das neu ausgewählte Bild
+                    // oder das ursprünglich vorhandene Bild enthält.
+                    // Wenn selectedFileBase64 leer ist (z.B. wenn der Button ursprünglich kein Bild hatte
+                    // und keines hinzugefügt wurde, oder wenn die Bild-URL explizit gelöscht wurde),
+                    // dann setze das Bild auf einen leeren String.
+                    currentButtons[buttonIndex].image = selectedFileBase64 || '';
+                }
+            }
+
+            // Seiten-Titel Einstellungen aktualisieren
+            currentPageTitle = pageTitleInput.value;
+            hidePageTitle = hidePageTitleCheckbox.checked;
+            currentTabTitle = tabTitleInput.value; // Tab-Titel aktualisieren
+            currentPageTitleFont = pageTitleFontSelect.value; // Seitentitel-Schriftart speichern
+
+            // Suchleiste Einstellungen aktualisieren
+            currentDefaultSearchProvider = searchProviderSelect.value; // Standardsuchanbieter aktualisieren
+            currentActiveSearchProvider = currentDefaultSearchProvider; // Aktiver Suchanbieter wird zum Standardsuchanbieter
+
+            // Aktualisiere die Schnellauswahl in der Suchleiste und den Placeholder
+            quickSearchProviderSelect.value = currentActiveSearchProvider;
+            googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+
+
+            // Hintergrund-Einstellungen aktualisieren
+            currentBackgroundType = backgroundTypeSelect.value;
+            if (currentBackgroundType === 'color') {
+                currentBackgroundColor = bgColorPicker.value;
+                currentBackgroundImageUrl = '';
+                currentBackgroundImageBase64 = '';
+            } else if (currentBackgroundType === 'image') {
+                // backgroundImageUrl und currentBackgroundImageBase64 werden bereits durch ihre Event-Listener aktualisiert
+                currentBackgroundColor = ''; // Farbe zurücksetzen
+            } else if (currentBackgroundType === 'gradient') {
+                currentGradientColor1 = gradientColor1.value;
+                currentGradientColor2 = gradientColor2.value;
+                currentGradientDirection = gradientDirection.value;
+                currentBackgroundColor = ''; // Farbe zurücksetzen
+                currentBackgroundImageUrl = ''; // Bild-URL zurücksetzen
+                currentBackgroundImageBase64 = ''; // Base64-Bild zurücksetzen
+            }
+
+            // Raster-Einstellungen aktualisieren
+            currentMaxColumns = parseInt(maxColumnsInput.value);
+            currentBaseTileHeight = parseInt(baseTileHeightInput.value);
+
+            // Einstellungs-Button-Einstellungen aktualisieren
+            settingsButtonPositionRadios.forEach(radio => {
+                if (radio.checked) {
+                    currentSettingsButtonPosition = radio.value;
+                }
+            });
+            settingsButtonDisplayRadios.forEach(radio => {
+                if (radio.checked) {
+                    currentSettingsButtonDisplay = radio.value;
+                }
+            });
+
+
+            saveSettings(); // Einstellungen speichern
+            renderButtons(); // Buttons neu rendern
+            applyPageTitleSettings(); // Seiten-Titel anwenden
+            applyTabTitleSettings(); // Tab-Titel anwenden
+            applySearchPosition(); // Suchleisten-Position anwenden
+            applyBackgroundSettings(); // Hintergrund anwenden
+            applyGridSettings(); // Raster-Einstellungen anwenden
+            applySettingsButton(); // Einstellungs-Button anwenden
+            applyFavicon(); // Favicon anwenden
+            closeSettingsModal(); // Modal schließen
+        });
+
+        // Event-Listener für den "Abbrechen"-Button im Modal
+        cancelSettingsButton.addEventListener('click', () => {
+            closeSettingsModal(); // Modal schließen
+        });
+
+        // Event-Listener für den Einstellungs-Button
+        settingsButton.addEventListener('click', openSettingsModal);
+
+        // Event-Listener für die Google-Suchleiste (jetzt allgemeiner Suchleisten-Input)
+        googleSearchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const query = googleSearchInput.value.trim();
+                if (query) {
+                    // Verwende den Wert aus dem Quick-Select für die Suche
+                    const selectedSearchProvider = quickSearchProviderSelect.value;
+                    const searchUrl = searchProviders[selectedSearchProvider] + encodeURIComponent(query);
+                    window.location.href = searchUrl;
+                }
+            }
+        });
+
+        // Event-Listener für die Schnellauswahl des Suchanbieters
+        quickSearchProviderSelect.addEventListener('change', () => {
+            const selectedProvider = quickSearchProviderSelect.value;
+            googleSearchInput.placeholder = searchPlaceholders[selectedProvider];
+            currentActiveSearchProvider = selectedProvider; // Aktualisiere nur den aktiven Suchanbieter
+            // Die Standardsuchmaschine in den Einstellungen wird hier nicht direkt beeinflusst.
+            // Sie wird nur aktualisiert, wenn die Einstellungen explizit gespeichert werden.
+        });
+
+        // Event-Listener für Kategorie-Buttons
+        openBackgroundSettingsButton.addEventListener('click', () => showMenu('backgroundSettingsSubmenu'));
+        openPageTitleSettingsButton.addEventListener('click', () => showMenu('pageTitleSettingsSubmenu'));
+        openSearchBarSettingsButton.addEventListener('click', () => showMenu('searchBarSettingsSubmenu'));
+        openGridSettingsButton.addEventListener('click', () => showMenu('gridSettingsSubmenu'));
+        openButtonManagementButton.addEventListener('click', () => showMenu('buttonManagementSubmenu'));
+        openSettingsButtonSettingsButton.addEventListener('click', () => showMenu('settingsButtonSettingsSubmenu'));
+        openBackupRestoreSettingsButton.addEventListener('click', () => showMenu('backupRestoreSettingsSubmenu')); // NEU: Event-Listener für Backup/Restore
+
+        // Event-Listener für "Zurück"-Buttons
+        backToMainMenuButtons.forEach(button => {
+            button.addEventListener('click', () => showMenu('mainSettingsMenu'));
+        });
+
+        // NEU: Export-Funktionalität
+        exportSettingsButton.addEventListener('click', () => {
+            const settingsToExport = {
+                buttons: currentButtons,
+                bgColor: currentBackgroundColor,
+                pageTitle: currentPageTitle,
+                hidePageTitle: hidePageTitle,
+                tabTitle: currentTabTitle,
+                defaultSearchProvider: currentDefaultSearchProvider,
+                faviconBase64: currentFaviconBase64,
+                backgroundType: currentBackgroundType,
+                backgroundImageUrl: currentBackgroundImageUrl,
+                backgroundImageBase64: currentBackgroundImageBase64,
+                gradientColor1: currentGradientColor1,
+                gradientColor2: currentGradientColor2,
+                gradientDirection: currentGradientDirection,
+                pageTitleFont: currentPageTitleFont,
+                maxColumns: currentMaxColumns,
+                baseTileHeight: currentBaseTileHeight,
+                settingsButtonPosition: currentSettingsButtonPosition,
+                settingsButtonDisplay: currentSettingsButtonDisplay
+            };
+
+            const dataStr = JSON.stringify(settingsToExport, null, 2); // Schön formatiertes JSON
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'browser_startpage_settings.json';
+            document.body.appendChild(a); // Temporär zum DOM hinzufügen
+            a.click(); // Klick simulieren
+            document.body.removeChild(a); // Entfernen
+            URL.revokeObjectURL(url); // URL freigeben
+        });
+
+        // NEU: Import-Funktionalität
+        importSettingsButton.addEventListener('click', () => {
+            const file = importSettingsFile.files[0];
+            if (!file) {
+                importMessage.textContent = 'Bitte wählen Sie eine JSON-Datei aus.';
+                return;
+            }
+
+            // Buttons deaktivieren, um Unterbrechungen zu verhindern
+            cancelSettingsButton.disabled = true;
+            saveSettingsButton.disabled = true;
+            exportSettingsButton.disabled = true; // Export-Button auch deaktivieren
+            importSettingsButton.disabled = true; // Auch den Import-Button selbst deaktivieren
+            importSettingsFile.disabled = true; // Dateiauswahlfeld deaktivieren
+            resetSettingsButton.disabled = true; // Reset-Button deaktivieren
+
+            importMessage.textContent = 'Import wird gestartet... Bitte warten.';
+            importMessage.style.color = '#FFFFFF'; // Neutrale Farbe für den Ladezustand
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedSettings = JSON.parse(e.target.result);
+
+                    // Grundlegende Validierung der importierten Daten
+                    if (importedSettings && typeof importedSettings === 'object' && Array.isArray(importedSettings.buttons)) {
+                        // Importierte Einstellungen in Local Storage speichern
+                        localStorage.setItem('browserStartPageButtons', JSON.stringify(importedSettings.buttons));
+                        localStorage.setItem('browserStartPageBgColor', importedSettings.bgColor || '#1a202c');
+                        localStorage.setItem('browserStartPageTitle', importedSettings.pageTitle !== undefined ? importedSettings.pageTitle : 'Willkommen auf deiner Startseite');
+                        localStorage.setItem('browserStartPageHideTitle', importedSettings.hidePageTitle !== undefined ? importedSettings.hidePageTitle : false);
+                        localStorage.setItem('browserStartPageTabTitle', importedSettings.tabTitle !== undefined ? importedSettings.tabTitle : 'Meine Startseite');
+                        localStorage.setItem('browserStartPageSearchProvider', importedSettings.defaultSearchProvider || 'google');
+                        localStorage.setItem('browserStartPageFavicon', importedSettings.faviconBase64 || '');
+                        localStorage.setItem('browserStartPageBackgroundType', importedSettings.backgroundType || 'color');
+                        localStorage.setItem('browserStartPageBackgroundImageUrl', importedSettings.backgroundImageUrl || '');
+                        localStorage.setItem('browserStartPageBackgroundImageBase64', importedSettings.backgroundImageBase64 || '');
+                        localStorage.setItem('browserStartPageGradientColor1', importedSettings.gradientColor1 || '#4F46E5');
+                        localStorage.setItem('browserStartPageGradientColor2', importedSettings.gradientColor2 || '#EC4899');
+                        localStorage.setItem('browserStartPageGradientDirection', importedSettings.gradientDirection || 'to right');
+                        localStorage.setItem('browserStartPageTitleFont', importedSettings.pageTitleFont || 'Inter, sans-serif');
+                        localStorage.setItem('browserStartPageMaxColumns', importedSettings.maxColumns !== undefined ? importedSettings.maxColumns : 6);
+                        localStorage.setItem('browserStartPageBaseTileHeight', importedSettings.baseTileHeight !== undefined ? importedSettings.baseTileHeight : 150);
+                        localStorage.setItem('browserStartPageSettingsButtonPosition', importedSettings.settingsButtonPosition || 'bottom-right');
+                        localStorage.setItem('browserStartPageSettingsButtonDisplay', importedSettings.settingsButtonDisplay || 'text');
+
+                        importMessage.textContent = 'Einstellungen erfolgreich importiert! Die Seite wird neu geladen...';
+                        importMessage.style.color = '#48BB78'; // Grün für Erfolg
+                        setTimeout(() => {
+                            location.reload(); // Seite neu laden, um die neuen Einstellungen anzuwenden
+                        }, 1500);
+
+                    } else {
+                        importMessage.textContent = 'Ungültiges Dateiformat. Bitte wählen Sie eine gültige Einstellungen-JSON-Datei.';
+                        importMessage.style.color = '#F56565'; // Rot für Fehler
+                        // Buttons bei Fehler wieder aktivieren
+                        cancelSettingsButton.disabled = false;
+                        saveSettingsButton.disabled = false;
+                        exportSettingsButton.disabled = false;
+                        importSettingsButton.disabled = false;
+                        importSettingsFile.disabled = false;
+                        resetSettingsButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Parsen der importierten Datei:', error);
+                    importMessage.textContent = 'Fehler beim Lesen der Datei. Stellen Sie sicher, dass es eine gültige JSON-Datei ist.';
+                    importMessage.style.color = '#F56565'; // Rot für Fehler
+                    // Buttons bei Fehler wieder aktivieren
+                    cancelSettingsButton.disabled = false;
+                    saveSettingsButton.disabled = false;
+                    exportSettingsButton.disabled = false;
+                    importSettingsButton.disabled = false;
+                    importSettingsFile.disabled = false;
+                    resetSettingsButton.disabled = false;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Funktion zum Anzeigen des benutzerdefinierten Bestätigungs-Modals
+        function showConfirmationModal(message, onConfirmCallback) {
+            confirmationMessage.textContent = message;
+            confirmationModal.style.display = 'flex';
+
+            // Deaktiviere Interaktion mit dem darunterliegenden Einstellungs-Modal
+            settingsModal.style.pointerEvents = 'none';
+            settingsModal.style.opacity = '0.5'; // Visuell anzeigen, dass es deaktiviert ist
+
+            // Vorherige Listener entfernen, um Mehrfachausführung zu verhindern
+            confirmYesButton.onclick = null;
+            confirmNoButton.onclick = null;
+
+            confirmYesButton.onclick = () => {
+                onConfirmCallback();
+                hideConfirmationModal();
+            };
+
+            confirmNoButton.onclick = () => {
+                hideConfirmationModal();
+                // Buttons im Haupt-Einstellungs-Modal wieder aktivieren, wenn Bestätigung abgebrochen wird
+                cancelSettingsButton.disabled = false;
+                saveSettingsButton.disabled = false;
+                exportSettingsButton.disabled = false;
+                importSettingsButton.disabled = false;
+                importSettingsFile.disabled = false;
+                resetSettingsButton.disabled = false;
+            };
+        }
+
+        // Funktion zum Ausblenden des benutzerdefinierten Bestätigungs-Modals
+        function hideConfirmationModal() {
+            confirmationModal.style.display = 'none';
+            // Interaktion mit dem darunterliegenden Einstellungs-Modal wieder aktivieren
+            settingsModal.style.pointerEvents = 'auto';
+            settingsModal.style.opacity = '1';
+        }
+
+        // NEU: Reset-Funktionalität
+        resetSettingsButton.addEventListener('click', () => {
+            // Buttons sofort deaktivieren, wenn Reset initiiert wird
+            cancelSettingsButton.disabled = true;
+            saveSettingsButton.disabled = true;
+            exportSettingsButton.disabled = true;
+            importSettingsButton.disabled = true;
+            importSettingsFile.disabled = true;
+            resetSettingsButton.disabled = true;
+
+            // Import-Nachricht leeren, wenn Bestätigung geöffnet wird
+            importMessage.textContent = '';
+
+            showConfirmationModal('Möchten Sie wirklich alle Einstellungen auf den Ursprungszustand zurücksetzen? Dies kann nicht rückgängig gemacht werden.', () => {
+                // Dies ist die eigentliche Reset-Logik, die nur ausgeführt wird, wenn 'Ja' geklickt wird
+                localStorage.removeItem('browserStartPageButtons');
+                localStorage.removeItem('browserStartPageBgColor');
+                localStorage.removeItem('browserStartPageTitle');
+                localStorage.removeItem('browserStartPageHideTitle');
+                localStorage.removeItem('browserStartPageTabTitle');
+                localStorage.removeItem('browserStartPageSearchProvider');
+                localStorage.removeItem('browserStartPageFavicon');
+                localStorage.removeItem('browserStartPageBackgroundType');
+                localStorage.removeItem('browserStartPageBackgroundImageUrl');
+                localStorage.removeItem('browserStartPageBackgroundImageBase64');
+                localStorage.removeItem('browserStartPageGradientColor1');
+                localStorage.removeItem('browserStartPageGradientColor2');
+                localStorage.removeItem('browserStartPageGradientDirection');
+                localStorage.removeItem('browserStartPageTitleFont');
+                localStorage.removeItem('browserStartPageMaxColumns');
+                localStorage.removeItem('browserStartPageBaseTileHeight');
+                localStorage.removeItem('browserStartPageSettingsButtonPosition');
+                localStorage.removeItem('browserStartPageSettingsButtonDisplay');
+
+                importMessage.textContent = 'Einstellungen zurückgesetzt! Die Seite wird neu geladen...';
+                importMessage.style.color = '#48BB78'; // Grün für Erfolg
+                setTimeout(() => {
+                    location.reload(); // Seite neu laden, um die Standardeinstellungen anzuwenden
+                }, 1500);
+            });
+        });
+
+
+        // Initialisierungsfunktion, die beim Laden der Seite aufgerufen wird
+        function init() {
+            loadSettings(); // Einstellungen laden
+            applyBackgroundSettings(); // Hintergrund anwenden
+            applyPageTitleSettings(); // Seiten-Titel anwenden
+            applyTabTitleSettings(); // Tab-Titel anwenden
+            applySearchPosition(); // Suchleisten-Position anwenden
+            applyGridSettings(); // Raster-Einstellungen anwenden
+            applySettingsButton(); // Einstellungs-Button anwenden
+            applyFavicon(); // Favicon anwenden
+            renderButtons(); // Buttons rendern
+
+            // Setze den Wert des Quick-Selects und den Placeholder beim Laden der Seite
+            quickSearchProviderSelect.value = currentActiveSearchProvider;
+            googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+        }
+
+        // Seite initialisieren, sobald der DOM geladen ist
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

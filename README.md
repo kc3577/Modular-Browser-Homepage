@@ -6,6 +6,10 @@ This Page was not coded by me but was created by me through Gemini.
 
 ---
 
+<a href="https://github.com/kc3577/Modular-Browser-Homepage">Modular-Browser-Homepage</a> © 2025 by <a href="https://github.com/kc3577">KC3577</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;">
+
+---
+
 ## 🚀 Features
 
 * Customizable Page Title: You can customize the large title at the top of the page, change its font, or hide it entirely.

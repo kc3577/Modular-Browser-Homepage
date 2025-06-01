@@ -3,144 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Startseite</title>
+    <title>My Startpage</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link id="faviconLink" rel="icon" type="image/x-icon" href="">
     <style>
-        /* Grundlegende Stile für die Seite */
-        html, body { /* Stellt sicher, dass HTML und Body die volle Höhe einnehmen */
+        /* Basic page styles */
+        html, body { /* Ensure HTML and Body take full height */
             height: 100%;
         }
         body {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, background-image 0.3s ease; /* Sanfter Übergang für Hintergrund */
-            background-size: cover; /* Bild deckt den gesamten Bereich ab */
-            background-position: center; /* Bild zentrieren */
-            background-repeat: no-repeat; /* Bild nicht wiederholen */
-            background-attachment: fixed; /* Bild beim Scrollen fixieren */
+            transition: background-color 0.3s ease, background-image 0.3s ease; /* Smooth transition for background */
+            background-size: cover; /* Image covers the entire area */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat image */
+            background-attachment: fixed; /* Fix image on scroll */
         }
 
-        /* Stil für den Button-Container, um die Buttons zu zentrieren */
+        /* Style for the button container to center the buttons */
         .tiles-grid {
             display: grid;
-            /* Spaltenanzahl und deren Breite sind fest, basierend auf max-cols und base-tile-height */
+            /* Column count and width are fixed, based on max-cols and base-tile-height */
             grid-template-columns: repeat(var(--max-cols, 6), var(--base-tile-height, 150px));
-            /* Reihenhöhe ist fest, basierend auf base-tile-height */
+            /* Row height is fixed, based on base-tile-height */
             grid-auto-rows: var(--base-tile-height, 150px);
-            gap: 1rem; /* Abstand zwischen den Buttons */
-            /* Feste Breite des Rasters, berechnet aus Spaltenanzahl, Kachelhöhe, Lücken UND Padding */
-            width: calc(var(--max-cols, 6) * var(--base-tile-height, 150px) + (var(--max-cols, 6) - 1) * 1rem + 2rem);
-            margin: 0 auto; /* Zentriert das Raster */
-            padding: 1rem; /* Innenabstand */
-            /* Maximale Höhe des Rasters basierend auf sichtbaren Reihen und Kachelhöhe */
+            gap: 1rem; /* Space between buttons */
+            /* Fixed grid width, calculated from column count, tile height, gaps AND padding AND border */
+            width: calc(var(--max-cols, 6) * var(--base-tile-height, 150px) + (var(--max-cols, 6) - 1) * 1rem + 2rem + 4px);
+            margin: 0 auto; /* Center the grid */
+            padding: 1rem; /* Inner spacing */
+            /* Maximum height of the grid based on visible rows and tile height */
             max-height: calc(var(--max-rows, 3) * var(--base-tile-height, 150px) + (var(--max-rows, 3) - 1) * 1rem);
-            overflow-y: auto; /* Vertikales Scrollen ermöglichen, wenn Inhalt die max-height überschreitet */
-            overflow-x: hidden; /* Horizontalen Scrollbalken explizit verhindern */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+            overflow-x: hidden; /* Explicitly prevent horizontal scrollbar */
+            position: relative; /* Important for absolute positioning of the indicator */
+            border-radius: 0.5rem; /* Rounded corners for the grid */
+            border: 2px solid transparent; /* Transparent border by default, but solid */
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0); /* No shadow by default */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Transition for the border */
         }
 
-        /* Stil für einzelne Buttons (Kacheln) */
+        /* Style for individual buttons (tiles) */
         .tile {
             display: flex; /* Use flex to center content when only title is visible */
             justify-content: center;
             align-items: center;
-            border-radius: 0.5rem; /* Abgerundete Ecken */
+            border-radius: 0.5rem; /* Rounded corners */
             color: white;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover-Effekte */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Hover effects */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow */
             /* aspect-ratio: 1 / 1; REMOVED: Aspect ratio is now controlled by grid-column/grid-row */
             position: relative; /* For overflow hidden, if image goes outside */
             overflow: hidden; /* Ensures image respects border-radius */
         }
 
-        /* Hover-Effekt für die Buttons */
+        /* Hover effect for buttons */
         .tile:hover {
-            transform: scale(1.05); /* Leichtes Vergrößern beim Hover */
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Stärkerer Schatten beim Hover */
+            transform: scale(1.05); /* Slightly enlarge on hover */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
         }
 
-        /* Stil für das Bild/Icon innerhalb der Kachel */
+        /* Style for the image/icon within the tile */
         .tile img {
-            width: 100%; /* Bild füllt die gesamte Breite des Containers */
-            height: 100%; /* Bild füllt die gesamte Höhe des Containers */
-            object-fit: contain; /* Bild anpassen, um in den Bereich zu passen, ohne beschnitten zu werden */
-            border-radius: 0.5rem; /* Abgerundete Ecken für Bilder - MATCHES PARENT */
-            position: absolute; /* Position absolut, um den Button auszufüllen */
+            width: 100%; /* Image fills the entire width of the container */
+            height: 100%; /* Image fills the entire height of the container */
+            object-fit: contain; /* Adjust image to fit within the area without being cropped */
+            border-radius: 0.5rem; /* Rounded corners for images - MATCHES PARENT */
+            position: absolute; /* Absolute position to fill the button */
             top: 0;
             left: 0;
-            z-index: 1; /* Bild unter dem Titel */
+            z-index: 1; /* Image below the title */
         }
 
-        /* Stil für den Titel innerhalb der Kachel */
+        /* Style for the title within the tile */
         .tile h3 {
-            font-size: 1.125rem; /* Schriftgröße des Titels */
-            font-weight: 600; /* Halbfett */
-            white-space: nowrap; /* Verhindert Zeilenumbruch */
-            overflow: hidden; /* Überlaufenden Text ausblenden */
-            text-overflow: ellipsis; /* Drei Punkte bei Überlauf */
-            max-width: 90%; /* Maximale Breite des Titels, mit etwas Rand */
-            padding: 0.5rem; /* Padding für den Titel */
-            position: absolute; /* Position absolut, um über dem Bild zu liegen */
-            top: 50%; /* Vertikal zentrieren */
-            left: 50%; /* Horizontal zentrieren */
-            transform: translate(-50%, -50%); /* Exakte Zentrierung */
-            z-index: 2; /* Titel über dem Bild */
-            text-shadow: 0 0 5px rgba(0,0,0,0.7); /* Leichter Schatten für bessere Lesbarkeit */
+            font-size: 1.125rem; /* Font size of the title */
+            font-weight: 600; /* Semi-bold */
+            white-space: nowrap; /* Prevent line breaks */
+            overflow: hidden; /* Hide overflowing text */
+            text-overflow: ellipsis; /* Three dots on overflow */
+            max-width: 90%; /* Maximum width of the title, with some margin */
+            padding: 0.5rem; /* Padding for the title */
+            position: absolute; /* Absolute position to lie above the image */
+            top: 50%; /* Vertically center */
+            left: 50%; /* Horizontally center */
+            transform: translate(-50%, -50%); /* Exact centering */
+            z-index: 2; /* Title above the image */
+            text-shadow: 0 0 5px rgba(0,0,0,0.7); /* Slight shadow for better readability */
         }
 
-        /* CSS-Klassen für verschiedene Kachelgrößen */
-        /* Die Größen werden nun direkt durch das Spannen der quadratischen Grid-Zellen kontrolliert */
+        /* CSS classes for various tile sizes */
+        /* Sizes are now directly controlled by spanning grid cells */
         .tile[data-size="1x1"] {
             grid-column: span 1;
             grid-row: span 1;
         }
-        .tile[data-size="2x1"] { /* Breite Kachel */
+        .tile[data-size="2x1"] { /* Wide tile */
             grid-column: span 2;
             grid-row: span 1;
         }
-        .tile[data-size="1x2"] { /* Hohe Kachel */
+        .tile[data-size="1x2"] { /* Tall tile */
             grid-column: span 1;
             grid-row: span 2;
         }
-        .tile[data-size="2x2"] { /* Große Kachel */
+        .tile[data-size="2x2"] { /* Large tile */
             grid-column: span 2;
             grid-row: span 2;
         }
-        .tile[data-size="3x1"] { /* Sehr Breite Kachel */
+        .tile[data-size="3x1"] { /* Very Wide tile */
             grid-column: span 3;
             grid-row: span 1;
         }
-        .tile[data-size="1x3"] { /* Sehr Hohe Kachel */
+        .tile[data-size="1x3"] { /* Very Tall tile */
             grid-column: span 1;
             grid-row: span 3;
         }
 
-        /* Stil für das Modal (Einstellungsfenster) */
+        /* Style for the modal (settings window) */
         .modal {
-            display: none; /* Standardmäßig versteckt */
+            display: none; /* Hidden by default */
             position: fixed;
-            z-index: 100; /* Über allem anderen */
+            z-index: 100; /* Above everything else */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Scrollbar, wenn Inhalt zu groß */
-            background-color: rgba(0, 0, 0, 0.7); /* Halbtransparenter Hintergrund */
-            backdrop-filter: blur(5px); /* Weichzeichner-Effekt */
+            overflow: auto; /* Scrollbar if content is too large */
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            backdrop-filter: blur(5px); /* Blur effect */
             justify-content: center;
             align-items: center;
         }
 
         .modal-content {
-            background-color: #2d3748; /* Dunkler Hintergrund für das Modal */
+            background-color: #2d3748; /* Dark background for the modal */
             padding: 2rem;
-            border-radius: 0.75rem; /* Abgerundete Ecken */
+            border-radius: 0.75rem; /* Rounded corners */
             width: 90%;
-            max-width: 600px; /* Maximale Breite */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stärkerer Schatten */
+            max-width: 600px; /* Maximum width */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stronger shadow */
             color: white;
             display: flex;
             flex-direction: column;
@@ -151,18 +156,18 @@
         .modal-content input[type="color"],
         .modal-content select,
         .modal-content input[type="file"],
-        .modal-content input[type="number"] { /* Auch für den Dateiauswahl-Input und Number Input */
+        .modal-content input[type="number"] { /* Also for file input and number input */
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
-            border: 1px solid #4a5568; /* Dunklerer Rand */
+            border: 1px solid #4a5568; /* Darker border */
             border-radius: 0.375rem;
-            background-color: #4a5568; /* Dunkler Hintergrund für Eingabefelder */
+            background-color: #4a5568; /* Dark background for input fields */
             color: white;
         }
 
         .modal-content input[type="file"] {
-            padding: 0.5rem; /* Etwas weniger Padding für Dateiauswahl */
+            padding: 0.5rem; /* Slightly less padding for file input */
         }
 
         .modal-content button {
@@ -172,7 +177,7 @@
             transition: background-color 0.2s ease;
         }
 
-        /* Stil für die Suchleiste */
+        /* Style for the search bar */
         .search-bar {
             display: flex;
             justify-content: center;
@@ -185,9 +190,9 @@
             width: 100%;
             max-width: 600px;
             padding: 0.75rem 1.25rem;
-            border-radius: 9999px; /* Pillenform */
+            border-radius: 9999px; /* Pill shape */
             border: 1px solid #4a5568;
-            background-color: #2d3748;
+            background-color: rgba(45, 55, 72, 0.7); /* Semi-transparent */
             color: white;
             outline: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -197,12 +202,22 @@
             color: #a0aec0;
         }
 
-        /* Neue Stile für Einstellungskategorien und Untermenüs */
+        /* Style for the quick search provider dropdown */
+        #quickSearchProviderSelect {
+            background-color: rgba(45, 55, 72, 0.7); /* Semi-transparent */
+            color: white;
+            padding: 0.75rem 1.25rem; /* Adjusted to match input padding */
+            border-radius: 9999px; /* Pill shape */
+            border: 1px solid #4a5568;
+            focus:ring-2 focus:ring-blue-500;
+        }
+
+        /* New styles for settings categories and submenus */
         .settings-category-button {
             width: 100%;
             padding: 1rem;
             margin-bottom: 1rem;
-            background-color: #4A5568; /* Dunkleres Grau */
+            background-color: #4A5568; /* Darker gray */
             color: white;
             font-size: 1.125rem;
             font-weight: 600;
@@ -214,7 +229,7 @@
         }
 
         .settings-category-button:hover {
-            background-color: #636B7A; /* Noch dunkleres Grau beim Hover */
+            background-color: #636B7A; /* Even darker gray on hover */
         }
 
         .settings-submenu {
@@ -236,36 +251,111 @@
             background-color: #8D94A0;
         }
 
-        /* Stile für den Einstellungs-Button */
-        #settingsButton {
+        /* Container for the two fixed buttons */
+        #controlButtonsContainer {
             position: fixed;
-            z-index: 50; /* Sicherstellen, dass er über anderem Inhalt liegt, aber unter dem Modal */
+            z-index: 50;
+            display: flex;
+            align-items: center; /* Vertically center */
+            gap: 0.5rem; /* Space between buttons */
+            transition: all 0.3s ease; /* Smooth transition for position changes */
         }
 
-        .settings-button-top-left { top: 1rem; left: 1rem; right: auto; bottom: auto; }
-        .settings-button-top-right { top: 1rem; right: 1rem; left: auto; bottom: auto; }
-        .settings-button-bottom-left { bottom: 1rem; left: 1rem; right: auto; top: auto; }
-        .settings-button-bottom-right { bottom: 1rem; right: 1rem; left: auto; top: auto; }
+        /* Positioning classes for the container */
+        .container-top-left { top: 1rem; left: 1rem; }
+        .container-top-right { top: 1rem; right: 1rem; }
+        .container-bottom-left { bottom: 1rem; left: 1rem; }
+        .container-bottom-right { bottom: 1rem; right: 1rem; }
 
-        /* Stil für den reinen Icon-Button */
+
+        /* Styles for the settings button */
+        #settingsButton {
+            z-index: 50; /* Keep z-index for stacking within the fixed container */
+            background-color: #2563EB; /* Default blue */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem; /* Default padding for text */
+            border-radius: 9999px; /* Pill shape */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        #settingsButton:hover {
+            background-color: #1D4ED8; /* Darker blue on hover */
+        }
+
+        /* Style for icon-only button */
         #settingsButton.icon-only {
-            width: 50px; /* Angepasste Größe für Icon */
+            width: 50px; /* Adjusted size for icon */
             height: 50px;
+            padding: 0; /* Remove padding for icon only */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem; /* Icon size */
+        }
+
+        /* Style for the lock button */
+        #toggleLockButtonsButton {
+            z-index: 50; /* Keep z-index for stacking within the fixed container */
+            width: 44px; /* Smaller size */
+            height: 44px;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem; /* Größe des Icons */
+            background-color: #4a5568; /* Muted gray for locked */
+            color: white;
+            border-radius: 9999px; /* Circular */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1.2rem; /* Icon size */
+        }
+        #toggleLockButtonsButton:hover {
+            transform: scale(1.1);
+            background-color: #636B7A; /* Slightly darker gray on hover */
+        }
+        #toggleLockButtonsButton.unlocked {
+            background-color: #3B82F6; /* A more prominent blue for unlocked */
+        }
+        #toggleLockButtonsButton.unlocked:hover {
+            background-color: #2563EB; /* Darker blue on hover when unlocked */
+        }
+
+        /* Drag & Drop Visuals */
+        .tile.opacity-0 { /* Original dragged tile */
+            opacity: 0;
+        }
+        /* New style for the line indicator */
+        .line-indicator {
+            background-color: #3B82F6; /* Blue line */
+            position: absolute; /* Absolute positioning */
+            width: 2px; /* Thin vertical line */
+            z-index: 10; /* Above the buttons */
+            border-radius: 1px; /* Rounded ends */
+            display: none; /* Hidden by default */
+            transition: left 0.1s ease, top 0.1s ease; /* Smooth transition for position */
+        }
+
+        /* New style for the tiles-grid when dragging is active */
+        .tiles-grid.drag-active {
+            border-color: #3B82F6; /* Blue dashed border */
+            border-style: solid; /* Changed from dashed to solid */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); /* Glowing shadow */
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col min-h-screen">
 
     <div class="flex-grow flex flex-col items-center justify-center p-4" id="mainContentWrapper">
-        <h1 id="pageTitle" class="text-4xl font-bold mb-8 text-center">Willkommen auf deiner Startseite</h1>
+        <h1 id="pageTitle" class="text-4xl font-bold mb-8 text-center"></h1>
 
-        <div id="searchBarContainer" class="search-bar flex items-center gap-2">
-            <input type="search" id="googleSearchInput" placeholder="Suche mit Google..." class="focus:ring-2 focus:ring-blue-500 flex-grow">
+        <div id="searchBarContainer" class="search-bar flex items-center gap-2 mx-auto max-w-2xl">
+            <div class="relative flex-grow">
+                <input type="search" id="googleSearchInput" class="focus:ring-2 focus:ring-blue-500 w-full pl-4 pr-10 py-2 rounded-full border border-gray-600 bg-gray-700 text-white outline-none shadow-md">
+                <i id="searchIcon" class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"></i>
+            </div>
             <select id="quickSearchProviderSelect" class="bg-gray-700 text-white p-2 rounded-full border border-gray-600 focus:ring-2 focus:ring-blue-500">
                 <option value="google">Google</option>
                 <option value="bing">Bing</option>
@@ -278,130 +368,139 @@
         <div id="tilesContainer" class="tiles-grid">
             </div>
 
-        <button id="settingsButton" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out">
-            Einstellungen
-        </button>
+        <div id="controlButtonsContainer">
+            <button id="toggleLockButtonsButton">
+                <i class="fas fa-lock"></i>
+            </button>
+            <button id="settingsButton">
+                Settings
+            </button>
+        </div>
     </div>
 
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-6 text-center" id="modalTitle">Einstellungen anpassen</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center" id="modalTitle"></h2>
 
             <div id="mainSettingsMenu" class="settings-submenu">
                 <button id="openBackgroundSettings" class="settings-category-button">
-                    Hintergrund Einstellungen
+                    <span data-i18n="backgroundSettings"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openPageTitleSettings" class="settings-category-button">
-                    Seiten-Titel Einstellungen
+                    <span data-i18n="pageTitleSettings"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openSearchBarSettings" class="settings-category-button">
-                    Suchleiste Einstellungen
+                    <span data-i18n="searchBarSettings"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openGridSettings" class="settings-category-button">
-                    Raster-Einstellungen
+                    <span data-i18n="gridSettings"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openButtonManagement" class="settings-category-button">
-                    Buttons verwalten
+                    <span data-i18n="manageButtons"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openSettingsButtonSettings" class="settings-category-button">
-                    Einstellungen Button
+                    <span data-i18n="settingsButtonSettings"></span>
+                    <span class="ml-2">></span>
+                </button>
+                <button id="openLanguageSettings" class="settings-category-button">
+                    <span data-i18n="languageSettings"></span>
                     <span class="ml-2">></span>
                 </button>
                 <button id="openBackupRestoreSettings" class="settings-category-button">
-                    Daten sichern/wiederherstellen
+                    <span data-i18n="backupRestoreData"></span>
                     <span class="ml-2">></span>
                 </button>
             </div>
 
             <div id="backgroundSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Hintergrund Einstellungen</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="backgroundSettings"></h3>
                 <div class="mb-4">
-                    <label for="backgroundTypeSelect" class="block text-sm font-medium mb-2">Hintergrundtyp:</label>
+                    <label for="backgroundTypeSelect" class="block text-sm font-medium mb-2" data-i18n="backgroundType"></label>
                     <select id="backgroundTypeSelect">
-                        <option value="color">Einfarbiger Hintergrund</option>
-                        <option value="image">Bild Hintergrund</option>
-                        <option value="gradient">Farbverlauf Hintergrund</option>
+                        <option value="color" data-i18n="solidColorBackground"></option>
+                        <option value="image" data-i18n="imageBackground"></option>
+                        <option value="gradient" data-i18n="gradientBackground"></option>
                     </select>
                 </div>
 
                 <div id="backgroundColorOptions" class="mb-4">
-                    <label for="bgColorPicker" class="block text-sm font-medium mb-2">Hintergrundfarbe:</label>
+                    <label for="bgColorPicker" class="block text-sm font-medium mb-2" data-i18n="backgroundColor"></label>
                     <input type="color" id="bgColorPicker" class="h-10 w-full p-0 border-none cursor-pointer">
                 </div>
 
                 <div id="backgroundImageOptions" class="hidden">
                     <div class="mb-4">
-                        <label for="backgroundImageFile" class="block text-sm font-medium mb-2">Bild vom PC auswählen:</label>
+                        <label for="backgroundImageFile" class="block text-sm font-medium mb-2" data-i18n="selectImageFromFile"></label>
                         <input type="file" id="backgroundImageFile" accept="image/*" class="mb-2">
                     </div>
                     <div class="mb-4">
-                        <label for="backgroundImageUrl" class="block text-sm font-medium mb-2">Bildlink (URL):</label>
+                        <label for="backgroundImageUrl" class="block text-sm font-medium mb-2" data-i18n="imageUrl"></label>
                         <input type="url" id="backgroundImageUrl" placeholder="https://example.com/background.jpg">
                     </div>
-                    <img id="currentBackgroundPreview" src="" alt="Hintergrundbild Vorschau" class="w-full h-32 object-cover rounded-md border border-gray-600 mb-4">
+                    <img id="currentBackgroundPreview" src="" alt="Background Image Preview" class="w-full h-32 object-cover rounded-md border border-gray-600 mb-4">
                 </div>
 
                 <div id="backgroundGradientOptions" class="hidden">
                     <div class="mb-4">
-                        <label for="gradientColor1" class="block text-sm font-medium mb-2">Verlaufsfarbe 1:</label>
+                        <label for="gradientColor1" class="block text-sm font-medium mb-2" data-i18n="gradientColor1"></label>
                         <input type="color" id="gradientColor1" class="h-10 w-full p-0 border-none cursor-pointer">
                     </div>
                     <div class="mb-4">
-                        <label for="gradientColor2" class="block text-sm font-medium mb-2">Verlaufsfarbe 2:</label>
+                        <label for="gradientColor2" class="block text-sm font-medium mb-2" data-i18n="gradientColor2"></label>
                         <input type="color" id="gradientColor2" class="h-10 w-full p-0 border-none cursor-pointer">
                     </div>
                     <div class="mb-4">
-                        <label for="gradientDirection" class="block text-sm font-medium mb-2">Verlaufsrichtung:</label>
+                        <label for="gradientDirection" class="block text-sm font-medium mb-2" data-i18n="gradientDirection"></label>
                         <select id="gradientDirection">
-                            <option value="to right">Nach rechts</option>
-                            <option value="to bottom">Nach unten</option>
-                            <option value="to bottom right">Nach unten rechts</option>
-                            <option value="to bottom left">Nach unten links</option>
-                            <option value="to top">Nach oben</option>
-                            <option value="to top right">Nach oben rechts</option>
-                            <option value="to top left">Nach oben links</option>
+                            <option value="to right" data-i18n="toRight"></option>
+                            <option value="to bottom" data-i18n="toBottom"></option>
+                            <option value="to bottom right" data-i18n="toBottomRight"></option>
+                            <option value="to bottom left" data-i18n="toBottomLeft"></option>
+                            <option value="to top" data-i18n="toTop"></option>
+                            <option value="to top right" data-i18n="toTopRight"></option>
+                            <option value="to top left" data-i18n="toTopLeft"></option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <div id="pageTitleSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Seiten-Titel Einstellungen</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="pageTitleSettings"></h3>
                 <div class="mb-4">
-                    <label for="pageTitleInput" class="block text-sm font-medium mb-2">Titel der Seite:</label>
-                    <input type="text" id="pageTitleInput" placeholder="Dein Seiten-Titel">
+                    <label for="pageTitleInput" class="block text-sm font-medium mb-2" data-i18n="pageTitle"></label>
+                    <input type="text" id="pageTitleInput" data-i18n-placeholder="yourPageTitle">
                 </div>
                 <div class="mb-4">
-                    <label for="pageTitleFontSelect" class="block text-sm font-medium mb-2">Schriftart des Titels:</label>
+                    <label for="pageTitleFontSelect" class="block text-sm font-medium mb-2" data-i18n="titleFont"></label>
                     <select id="pageTitleFontSelect"></select>
                 </div>
                 <div class="flex items-center mb-4">
                     <input type="checkbox" id="hidePageTitleCheckbox" class="mr-2 h-4 w-4 text-blue-600 rounded">
-                    <label for="hidePageTitleCheckbox" class="text-sm font-medium">Seiten-Titel ausblenden</label>
+                    <label for="hidePageTitleCheckbox" class="text-sm font-medium" data-i18n="hidePageTitle"></label>
                 </div>
                 <div class="mb-4">
-                    <label for="tabTitleInput" class="block text-sm font-medium mb-2">Titel der Tableiste:</label>
-                    <input type="text" id="tabTitleInput" placeholder="Titel des Browser-Tabs">
+                    <label for="tabTitleInput" class="block text-sm font-medium mb-2" data-i18n="tabTitle"></label>
+                    <input type="text" id="tabTitleInput" data-i18n-placeholder="browserTabTitle">
                 </div>
                 <div class="mb-4">
-                    <label for="faviconFileInput" class="block text-sm font-medium mb-2">Favicon auswählen (.ico, .png, .gif):</label>
+                    <label for="faviconFileInput" class="block text-sm font-medium mb-2" data-i18n="selectFavicon"></label>
                     <input type="file" id="faviconFileInput" accept=".ico,image/png,image/gif" class="mb-2">
-                    <img id="faviconPreview" src="" alt="Favicon Vorschau" class="w-10 h-10 object-contain rounded-md border border-gray-600">
+                    <img id="faviconPreview" src="" alt="Favicon Preview" class="w-10 h-10 object-contain rounded-md border border-gray-600">
                 </div>
             </div>
 
             <div id="searchBarSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Suchleiste Einstellungen</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="searchBarSettings"></h3>
                 <div class="mb-4">
-                    <label for="searchProviderSelect" class="block text-sm font-medium mb-2">Standardsuchanbieter:</label>
+                    <label for="searchProviderSelect" class="block text-sm font-medium mb-2" data-i18n="defaultSearchProvider"></label>
                     <select id="searchProviderSelect">
                         <option value="google">Google</option>
                         <option value="bing">Bing</option>
@@ -413,134 +512,146 @@
             </div>
 
             <div id="gridSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Raster-Einstellungen</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="gridSettings"></h3>
                 <div class="mb-4">
-                    <label for="maxColumnsInput" class="block text-sm font-medium mb-2">Maximale Spalten:</label>
+                    <label for="maxColumnsInput" class="block text-sm font-medium mb-2" data-i18n="maxColumns"></label>
                     <input type="number" id="maxColumnsInput" min="1" value="6">
                 </div>
                 <div class="mb-4">
-                    <label for="baseTileHeightInput" class="block text-sm font-medium mb-2">Grundhöhe der Kachel (1x1 in px):</label>
+                    <label for="baseTileHeightInput" class="block text-sm font-medium mb-2" data-i18n="baseTileHeight"></label>
                     <input type="number" id="baseTileHeightInput" min="50" value="150">
                 </div>
             </div>
 
             <div id="buttonManagementSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Buttons verwalten</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="manageButtons"></h3>
                 <div class="flex justify-between gap-4 mb-4">
-                    <button id="addButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex-grow">Button hinzufügen</button>
-                    <button id="removeButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex-grow">Ausgewählten Button entfernen</button>
+                    <button id="addButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex-grow" data-i18n="addButton"></button>
+                    <button id="removeButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex-grow" data-i18n="removeSelectedButton"></button>
                 </div>
                 <div class="mb-4">
-                    <label for="buttonSelect" class="block text-sm font-medium mb-2">Button zum Bearbeiten auswählen:</label>
+                    <label for="buttonSelect" class="block text-sm font-medium mb-2" data-i18n="selectButtonToEdit"></label>
                     <select id="buttonSelect">
                         </select>
                 </div>
                 <div id="buttonEditForm" class="hidden">
                     <div class="mb-4">
                         <label for="buttonTitle" class="block text-sm font-medium mb-2">
-                            Titel: <span class="text-gray-400 text-sm">(wird ausgeblendet, wenn Bild vorhanden)</span>
+                            <span data-i18n="title"></span>: <span class="text-gray-400 text-sm" data-i18n="titleHiddenIfImage"></span>
                         </label>
-                        <input type="text" id="buttonTitle" placeholder="Button Titel">
+                        <input type="text" id="buttonTitle" data-i18n-placeholder="buttonTitle">
                     </div>
 
                     <div id="buttonUrlOptions" class="mb-4">
-                        <label for="buttonLink" class="block text-sm font-medium mb-2">Verlinkung (URL):</label>
+                        <label for="buttonLink" class="block text-sm font-medium mb-2" data-i18n="linkUrl"></label>
                         <input type="url" id="buttonLink" placeholder="https://example.com">
                     </div>
 
                     <div class="mb-4">
-                        <label for="buttonTarget" class="block text-sm font-medium mb-2">Link-Ziel:</label>
+                        <label for="buttonTarget" class="block text-sm font-medium mb-2" data-i18n="linkTarget"></label>
                         <select id="buttonTarget">
-                            <option value="_self">Im selben Tab öffnen</option>
-                            <option value="_blank">In neuem Tab öffnen</option>
+                            <option value="_self" data-i18n="openInSameTab"></option>
+                            <option value="_blank" data-i18n="openInNewTab"></option>
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label for="buttonImage" class="block text-sm font-medium mb-2">Bild/Icon (Datei auswählen):</label>
+                        <label for="buttonImage" class="block text-sm font-medium mb-2" data-i18n="imageIcon"></label>
                         <input type="file" id="buttonImage" accept="image/*" class="mb-2">
-                        <img id="currentButtonImagePreview" src="" alt="Aktuelles Icon" class="w-20 h-20 object-contain rounded-md border border-gray-600">
-                        <button id="clearButtonImage" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md mt-2">Bild löschen</button>
+                        <img id="currentButtonImagePreview" src="" alt="Current Icon" class="w-20 h-20 object-contain rounded-md border border-gray-600">
+                        <button id="clearButtonImage" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md mt-2" data-i18n="clearImage"></button>
                     </div>
                     <div class="mb-4">
-                        <label for="buttonColor" class="block text-sm font-medium mb-2">Button Farbe:</label>
+                        <label for="buttonColor" class="block text-sm font-medium mb-2" data-i18n="buttonColor"></label>
                         <input type="color" id="buttonColor" class="h-10 w-full p-0 border-none cursor-pointer">
                     </div>
                     <div class="mb-4">
-                        <label for="buttonSize" class="block text-sm font-medium mb-2">Button Größe:</label>
+                        <label for="buttonSize" class="block text-sm font-medium mb-2" data-i18n="buttonSize"></label>
                         <select id="buttonSize">
-                            <option value="1x1">Standard (1x1)</option>
-                            <option value="2x1">Breit (2x1)</option>
-                            <option value="1x2">Hoch (1x2)</option>
-                            <option value="2x2">Groß (2x2)</option>
-                            <option value="3x1">Sehr Breit (3x1)</option>
-                            <option value="1x3">Sehr Hoch (1x3)</option>
+                            <option value="1x1" data-i18n="standard1x1"></option>
+                            <option value="2x1" data-i18n="wide2x1"></option>
+                            <option value="1x2" data-i18n="tall1x2"></option>
+                            <option value="2x2" data-i18n="large2x2"></option>
+                            <option value="3x1" data-i18n="veryWide3x1"></option>
+                            <option value="1x3" data-i18n="veryTall1x3"></option>
                         </select>
                     </div>
                     </div>
             </div>
 
             <div id="settingsButtonSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Einstellungen Button</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="settingsButtonSettings"></h3>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Position:</label>
+                    <label class="block text-sm font-medium mb-2" data-i18n="position"></label>
                     <div class="flex flex-wrap gap-2">
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonPosition" value="top-left" class="form-radio text-blue-600" id="btnPosTL">
-                            <span class="ml-2">Oben Links</span>
+                            <span class="ml-2" data-i18n="topLeft"></span>
                         </label>
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonPosition" value="top-right" class="form-radio text-blue-600" id="btnPosTR">
-                            <span class="ml-2">Oben Rechts</span>
+                            <span class="ml-2" data-i18n="topRight"></span>
                         </label>
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonPosition" value="bottom-left" class="form-radio text-blue-600" id="btnPosBL">
-                            <span class="ml-2">Unten Links</span>
+                            <span class="ml-2" data-i18n="bottomLeft"></span>
                         </label>
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonPosition" value="bottom-right" class="form-radio text-blue-600" id="btnPosBR">
-                            <span class="ml-2">Unten Rechts</span>
+                            <span class="ml-2" data-i18n="bottomRight"></span>
                         </label>
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Anzeige:</label>
+                    <label class="block text-sm font-medium mb-2" data-i18n="display"></label>
                     <div class="flex flex-wrap gap-2">
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonDisplay" value="text" class="form-radio text-blue-600" id="btnDisplayTxt">
-                            <span class="ml-2">Text</span>
+                            <span class="ml-2" data-i18n="text"></span>
                         </label>
                         <label class="inline-flex items-center">
                             <input type="radio" name="settingsButtonDisplay" value="icon" class="form-radio text-blue-600" id="btnDisplayIcon">
-                            <span class="ml-2">Zahnradsymbol</span>
+                            <span class="ml-2" data-i18n="cogIcon"></span>
                         </label>
                     </div>
                 </div>
             </div>
 
+            <div id="languageSettingsSubmenu" class="hidden settings-submenu">
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="languageSettings"></h3>
+                <div class="mb-4">
+                    <label for="languageSelect" class="block text-sm font-medium mb-2" data-i18n="selectLanguage"></label>
+                    <select id="languageSelect">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="backupRestoreSettingsSubmenu" class="hidden settings-submenu">
-                <button class="back-to-main-menu-button">Zurück</button>
-                <h3 class="text-xl font-semibold mb-3">Daten sichern/wiederherstellen</h3>
+                <button class="back-to-main-menu-button" data-i18n="back"></button>
+                <h3 class="text-xl font-semibold mb-3" data-i18n="backupRestoreData"></h3>
                 <div class="mb-4">
-                    <button id="exportSettingsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md w-full mb-2">Einstellungen exportieren</button>
+                    <button id="exportSettingsButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md w-full mb-2" data-i18n="exportSettings"></button>
                 </div>
                 <div class="mb-4">
-                    <label for="importSettingsFile" class="block text-sm font-medium mb-2">Einstellungen importieren (JSON-Datei):</label>
+                    <label for="importSettingsFile" class="block text-sm font-medium mb-2" data-i18n="importSettingsFile"></label>
                     <input type="file" id="importSettingsFile" accept=".json" class="mb-2">
-                    <button id="importSettingsButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md w-full">Importieren</button>
+                    <button id="importSettingsButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md w-full" data-i18n="import"></button>
                 </div>
                 <div class="mb-4">
-                    <button id="resetSettingsButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md w-full">Auf Ursprungszustand zurücksetzen</button>
+                    <button id="resetSettingsButton" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md w-full" data-i18n="resetToDefaults"></button>
                 </div>
                 <div id="importMessage" class="text-sm text-red-400 mt-2"></div>
             </div>
 
 
             <div class="flex justify-end gap-4 mt-6">
-                <button id="cancelSettings" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Abbrechen</button>
-                <button id="saveSettings" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Speichern</button>
+                <button id="cancelSettings" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md" data-i18n="cancel"></button>
+                <button id="saveSettings" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md" data-i18n="save"></button>
             </div>
         </div>
     </div>
@@ -549,14 +660,14 @@
         <div class="modal-content">
             <h3 class="text-xl font-semibold mb-4 text-center" id="confirmationMessage"></h3>
             <div class="flex justify-end gap-4 mt-6">
-                <button id="confirmNoButton" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Nein</button>
-                <button id="confirmYesButton" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Ja</button>
+                <button id="confirmNoButton" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md" data-i18n="no"></button>
+                <button id="confirmYesButton" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md" data-i18n="yes"></button>
             </div>
         </div>
     </div>
 
     <script>
-        // Verfügbare Schriftarten
+        // Available fonts
         const availableFonts = [
             { name: 'Inter', value: 'Inter, sans-serif' },
             { name: 'Arial', value: 'Arial, sans-serif' },
@@ -566,14 +677,14 @@
             { name: 'Courier New', value: '"Courier New", monospace' }
         ];
 
-        // Standard-Buttons, wenn noch keine Einstellungen gespeichert sind (12x 1x1)
+        // Default buttons if no settings are saved yet (12x 1x1)
         const defaultButtons = [
             { id: 'btn1', title: 'Google', link: 'https://www.google.com', image: 'https://placehold.co/80x80/4285F4/FFFFFF?text=G', color: '#4285F4', size: '1x1', target: '_self' },
             { id: 'btn2', title: 'YouTube', link: 'https://www.youtube.com', image: 'https://placehold.co/80x80/FF0000/FFFFFF?text=YT', color: '#FF0000', size: '1x1', target: '_self' },
             { id: 'btn3', title: 'Wikipedia', link: 'https://www.wikipedia.org', image: 'https://placehold.co/80x80/000000/FFFFFF?text=W', color: '#000000', size: '1x1', target: '_self' },
             { id: 'btn4', title: 'GitHub', link: 'https://github.com', image: 'https://placehold.co/80x80/181717/FFFFFF?text=GH', color: '#181717', size: '1x1', target: '_self' },
-            { id: 'btn5', title: 'Nachrichten', link: 'https://news.google.com', image: 'https://placehold.co/80x80/34A853/FFFFFF?text=News', color: '#34A853', size: '1x1', target: '_self' },
-            { id: 'btn6', title: 'E-Mail', link: 'https://mail.google.com', image: 'https://placehold.co/80x80/EA4335/FFFFFF?text=Mail', color: '#EA4335', size: '1x1', target: '_self' },
+            { id: 'btn5', title: 'News', link: 'https://news.google.com', image: 'https://placehold.co/80x80/34A853/FFFFFF?text=News', color: '#34A853', size: '1x1', target: '_self' },
+            { id: 'btn6', title: 'Email', link: 'https://mail.google.com', image: 'https://placehold.co/80x80/EA4335/FFFFFF?text=Mail', color: '#EA4335', size: '1x1', target: '_self' },
             { id: 'btn7', title: 'Spotify', link: 'https://open.spotify.com', image: 'https://placehold.co/80x80/1DB954/FFFFFF?text=S', color: '#1DB954', size: '1x1', target: '_self' },
             { id: 'btn8', title: 'Amazon', link: 'https://www.amazon.de', image: 'https://placehold.co/80x80/FF9900/FFFFFF?text=A', color: '#FF9900', size: '1x1', target: '_self' },
             { id: 'btn9', title: 'Twitter/X', link: 'https://twitter.com', image: 'https://placehold.co/80x80/000000/FFFFFF?text=X', color: '#000000', size: '1x1', target: '_self' },
@@ -582,30 +693,210 @@
             { id: 'btn12', title: 'ChatGPT', link: 'https://chat.openai.com', image: 'https://placehold.co/80x80/10A37F/FFFFFF?text=AI', color: '#10A37F', size: '1x1', target: '_self' }
         ];
 
-        // Suchanbieter-URLs
+        // Search provider URLs
         const searchProviders = {
             google: 'https://www.google.com/search?q=',
             bing: 'https://www.bing.com/search?q=',
             duckduckgo: 'https://www.duckduckgo.com/?q=',
             ecosia: 'https://www.ecosia.org/search?q=',
-            wikipedia: 'https://de.wikipedia.org/wiki/Spezial:Suche?search=' // Wikipedia-Such-URL
+            wikipedia: 'https://de.wikipedia.org/wiki/Spezial:Suche?search='
         };
 
-        // Such-Placeholder-Texte
+        // Search placeholder texts
         const searchPlaceholders = {
-            google: 'Suche mit Google...',
-            bing: 'Suche mit Bing...',
-            duckduckgo: 'Suche mit DuckDuckGo...',
-            ecosia: 'Suche mit Ecosia...',
-            wikipedia: 'Suche mit Wikipedia...' // Wikipedia-Placeholder
+            google: 'Search with Google...',
+            bing: 'Search with Bing...',
+            duckduckgo: 'Search with DuckDuckGo...',
+            ecosia: 'Search with Ecosia...',
+            wikipedia: 'Search with Wikipedia...'
         };
 
-        // Referenzen zu DOM-Elementen
+        // Translation object
+        const translations = {
+            de: {
+                pageTitleDefault: 'Willkommen auf deiner Startseite',
+                browserTabTitleDefault: 'Meine Startseite',
+                settings: 'Einstellungen',
+                modalTitle: 'Einstellungen anpassen',
+                backgroundSettings: 'Hintergrund Einstellungen',
+                pageTitleSettings: 'Seiten-Titel Einstellungen',
+                searchBarSettings: 'Suchleiste Einstellungen',
+                gridSettings: 'Raster-Einstellungen',
+                manageButtons: 'Buttons verwalten',
+                settingsButtonSettings: 'Einstellungen Button',
+                languageSettings: 'Sprach Einstellungen',
+                backupRestoreData: 'Daten sichern/wiederherstellen',
+                back: 'Zurück',
+                backgroundType: 'Hintergrundtyp:',
+                solidColorBackground: 'Einfarbiger Hintergrund',
+                imageBackground: 'Bild Hintergrund',
+                gradientBackground: 'Farbverlauf Hintergrund',
+                backgroundColor: 'Hintergrundfarbe:',
+                selectImageFromFile: 'Bild vom PC auswählen:',
+                imageUrl: 'Bildlink (URL):',
+                gradientColor1: 'Verlaufsfarbe 1:',
+                gradientColor2: 'Verlaufsfarbe 2:',
+                gradientDirection: 'Verlaufsrichtung:',
+                toRight: 'Nach rechts',
+                toBottom: 'Nach unten',
+                toBottomRight: 'Nach unten rechts',
+                toBottomLeft: 'Nach unten links',
+                toTop: 'Nach oben',
+                toTopRight: 'Nach oben rechts',
+                toTopLeft: 'Nach oben links',
+                pageTitle: 'Titel der Seite:',
+                yourPageTitle: 'Dein Seiten-Titel',
+                titleFont: 'Schriftart des Titels:',
+                hidePageTitle: 'Seiten-Titel ausblenden',
+                tabTitle: 'Titel der Tableiste:',
+                browserTabTitle: 'Titel des Browser-Tabs',
+                selectFavicon: 'Favicon auswählen (.ico, .png, .gif):',
+                defaultSearchProvider: 'Standardsuchanbieter:',
+                maxColumns: 'Maximale Spalten:',
+                baseTileHeight: 'Grundhöhe der Kachel (1x1 in px):',
+                addButton: 'Button hinzufügen',
+                removeSelectedButton: 'Ausgewählten Button entfernen',
+                selectButtonToEdit: 'Button zum Bearbeiten auswählen:',
+                title: 'Titel',
+                titleHiddenIfImage: '(wird ausgeblendet, wenn Bild vorhanden)',
+                buttonTitle: 'Button Titel',
+                linkUrl: 'Verlinkung (URL):',
+                linkTarget: 'Link-Ziel:',
+                openInSameTab: 'Im selben Tab öffnen',
+                openInNewTab: 'In neuem Tab öffnen',
+                imageIcon: 'Bild/Icon (Datei auswählen):',
+                clearImage: 'Bild löschen',
+                buttonColor: 'Button Farbe:',
+                buttonSize: 'Button Größe:',
+                standard1x1: 'Standard (1x1)',
+                wide2x1: 'Breit (2x1)',
+                tall1x2: 'Hoch (1x2)',
+                large2x2: 'Groß (2x2)',
+                veryWide3x1: 'Sehr Breit (3x1)',
+                veryTall1x3: 'Sehr Hoch (1x3)',
+                position: 'Position:',
+                topLeft: 'Oben Links',
+                topRight: 'Oben Rechts',
+                bottomLeft: 'Unten Links',
+                bottomRight: 'Unten Rechts',
+                display: 'Anzeige:',
+                text: 'Text',
+                cogIcon: 'Zahnradsymbol',
+                selectLanguage: 'Sprache auswählen:',
+                exportSettings: 'Einstellungen exportieren',
+                importSettingsFile: 'Einstellungen importieren (JSON-Datei):',
+                import: 'Importieren',
+                resetToDefaults: 'Auf Ursprungszustand zurücksetzen',
+                cancel: 'Abbrechen',
+                save: 'Speichern',
+                confirmReset: 'Möchten Sie wirklich alle Einstellungen auf den Ursprungszustand zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
+                settingsImported: 'Einstellungen erfolgreich importiert! Die Seite wird neu geladen...',
+                invalidFileFormat: 'Ungültiges Dateiformat. Bitte wählen Sie eine gültige Einstellungen-JSON-Datei.',
+                errorReadingFile: 'Fehler beim Lesen der Datei. Stellen Sie sicher, dass es eine gültige JSON-Datei ist.',
+                settingsReset: 'Einstellungen zurückgesetzt! Die Seite wird neu geladen...',
+                yes: 'Ja',
+                no: 'Nein',
+                pleaseSelectJson: 'Bitte wählen Sie eine JSON-Datei aus.',
+                importingSettings: 'Import wird gestartet... Bitte warten.'
+            },
+            en: {
+                pageTitleDefault: 'Welcome to your Startpage',
+                browserTabTitleDefault: 'My Startpage',
+                settings: 'Settings',
+                modalTitle: 'Customize Settings',
+                backgroundSettings: 'Background Settings',
+                pageTitleSettings: 'Page Title Settings',
+                searchBarSettings: 'Search Bar Settings',
+                gridSettings: 'Grid Settings',
+                manageButtons: 'Manage Buttons',
+                settingsButtonSettings: 'Settings Button',
+                languageSettings: 'Language Settings',
+                backupRestoreData: 'Backup/Restore Data',
+                back: 'Back',
+                backgroundType: 'Background Type:',
+                solidColorBackground: 'Solid Color Background',
+                imageBackground: 'Image Background',
+                gradientBackground: 'Gradient Background',
+                backgroundColor: 'Background Color:',
+                selectImageFromFile: 'Select image from PC:',
+                imageUrl: 'Image URL:',
+                gradientColor1: 'Gradient Color 1:',
+                gradientColor2: 'Gradient Color 2:',
+                gradientDirection: 'Gradient Direction:',
+                toRight: 'To Right',
+                toBottom: 'To Bottom',
+                toBottomRight: 'To Bottom Right',
+                toBottomLeft: 'To Bottom Left',
+                toTop: 'To Top',
+                toTopRight: 'To Top Right',
+                toTopLeft: 'To Top Left',
+                pageTitle: 'Page Title:',
+                yourPageTitle: 'Your Page Title',
+                titleFont: 'Title Font:',
+                hidePageTitle: 'Hide Page Title',
+                tabTitle: 'Tab Title:',
+                browserTabTitle: 'Browser Tab Title',
+                selectFavicon: 'Select Favicon (.ico, .png, .gif):',
+                defaultSearchProvider: 'Default Search Provider:',
+                maxColumns: 'Maximum Columns:',
+                baseTileHeight: 'Base Tile Height (1x1 in px):',
+                addButton: 'Add Button',
+                removeSelectedButton: 'Remove Selected Button',
+                selectButtonToEdit: 'Select Button to Edit:',
+                title: 'Title',
+                titleHiddenIfImage: '(will be hidden if image is present)',
+                buttonTitle: 'Button Title',
+                linkUrl: 'Link (URL):',
+                linkTarget: 'Link Target:',
+                openInSameTab: 'Open in same tab',
+                openInNewTab: 'Open in new tab',
+                imageIcon: 'Image/Icon (select file):',
+                clearImage: 'Clear Image',
+                buttonColor: 'Button Color:',
+                buttonSize: 'Button Size:',
+                standard1x1: 'Standard (1x1)',
+                wide2x1: 'Wide (2x1)',
+                tall1x2: 'Tall (1x2)',
+                large2x2: 'Large (2x2)',
+                veryWide3x1: 'Very Wide (3x1)',
+                veryTall1x3: 'Very Tall (1x3)',
+                position: 'Position:',
+                topLeft: 'Top Left',
+                topRight: 'Top Right',
+                bottomLeft: 'Bottom Left',
+                bottomRight: 'Bottom Right',
+                display: 'Display:',
+                text: 'Text',
+                cogIcon: 'Cog Icon',
+                selectLanguage: 'Select Language:',
+                exportSettings: 'Export Settings',
+                importSettingsFile: 'Import Settings (JSON file):',
+                import: 'Import',
+                resetToDefaults: 'Reset to Defaults',
+                cancel: 'Cancel',
+                save: 'Save',
+                confirmReset: 'Are you sure you want to reset all settings to their default state? This cannot be undone.',
+                settingsImported: 'Settings imported successfully! Page will reload...',
+                invalidFileFormat: 'Invalid file format. Please select a valid settings JSON file.',
+                errorReadingFile: 'Error reading file. Make sure it is a valid JSON file.',
+                settingsReset: 'Settings reset! Page will reload...',
+                yes: 'Yes',
+                no: 'No',
+                pleaseSelectJson: 'Please select a JSON file.',
+                importingSettings: 'Import starting... Please wait.'
+            }
+        };
+
+        // References to DOM elements (initialized in init())
+        let settingsButton;
+        let toggleLockButtonsButton;
+        let controlButtonsContainer;
+        let searchIcon; // Reference to the new search icon
+
         const body = document.body;
         const mainContentWrapper = document.getElementById('mainContentWrapper');
         const pageTitleElement = document.getElementById('pageTitle');
         const tilesContainer = document.getElementById('tilesContainer');
-        const settingsButton = document.getElementById('settingsButton');
         const settingsModal = document.getElementById('settingsModal');
         const cancelSettingsButton = document.getElementById('cancelSettings');
         const saveSettingsButton = document.getElementById('saveSettings');
@@ -613,28 +904,26 @@
         const buttonEditForm = document.getElementById('buttonEditForm');
         const buttonTitleInput = document.getElementById('buttonTitle');
         const buttonLinkInput = document.getElementById('buttonLink');
-        const buttonTargetSelect = document.getElementById('buttonTarget'); // Neuer Button
+        const buttonTargetSelect = document.getElementById('buttonTarget');
         const buttonImageInput = document.getElementById('buttonImage');
-        const clearButtonImage = document.getElementById('clearButtonImage'); // Neuer Button
+        const clearButtonImage = document.getElementById('clearButtonImage');
         const buttonColorInput = document.getElementById('buttonColor');
         const buttonSizeSelect = document.getElementById('buttonSize');
         const googleSearchInput = document.getElementById('googleSearchInput');
         const quickSearchProviderSelect = document.getElementById('quickSearchProviderSelect');
         const currentButtonImagePreview = document.getElementById('currentButtonImagePreview');
-        const faviconLink = document.getElementById('faviconLink'); // Referenz zum Favicon-Link-Tag
-        const faviconFileInput = document.getElementById('faviconFileInput'); // Favicon-Dateiauswahl
-        const faviconPreview = document.getElementById('faviconPreview'); // Favicon-Vorschau
+        const faviconLink = document.getElementById('faviconLink');
+        const faviconFileInput = document.getElementById('faviconFileInput');
+        const faviconPreview = document.getElementById('faviconPreview');
 
-        // Neue DOM-Elemente für Einstellungen
         const pageTitleInput = document.getElementById('pageTitleInput');
         const hidePageTitleCheckbox = document.getElementById('hidePageTitleCheckbox');
-        const tabTitleInput = document.getElementById('tabTitleInput'); // Neues Element für Tab-Titel
+        const tabTitleInput = document.getElementById('tabTitleInput');
         const searchProviderSelect = document.getElementById('searchProviderSelect');
         const addButton = document.getElementById('addButton');
         const removeButton = document.getElementById('removeButton');
         const searchBarContainer = document.getElementById('searchBarContainer');
 
-        // Hintergrund-Elemente
         const backgroundTypeSelect = document.getElementById('backgroundTypeSelect');
         const backgroundColorOptions = document.getElementById('backgroundColorOptions');
         const bgColorPicker = document.getElementById('bgColorPicker');
@@ -647,14 +936,11 @@
         const gradientColor2 = document.getElementById('gradientColor2');
         const gradientDirection = document.getElementById('gradientDirection');
 
-        // Neue Elemente für Schriftart-Einstellungen
         const pageTitleFontSelect = document.getElementById('pageTitleFontSelect');
 
-        // Neue Elemente für Raster-Einstellungen
         const maxColumnsInput = document.getElementById('maxColumnsInput');
         const baseTileHeightInput = document.getElementById('baseTileHeightInput');
 
-        // Neue DOM-Elemente für Menü-Navigation
         const mainSettingsMenu = document.getElementById('mainSettingsMenu');
         const backgroundSettingsSubmenu = document.getElementById('backgroundSettingsSubmenu');
         const pageTitleSettingsSubmenu = document.getElementById('pageTitleSettingsSubmenu');
@@ -662,7 +948,8 @@
         const gridSettingsSubmenu = document.getElementById('gridSettingsSubmenu');
         const buttonManagementSubmenu = document.getElementById('buttonManagementSubmenu');
         const settingsButtonSettingsSubmenu = document.getElementById('settingsButtonSettingsSubmenu');
-        const backupRestoreSettingsSubmenu = document.getElementById('backupRestoreSettingsSubmenu'); // NEU: Backup/Restore Submenu
+        const languageSettingsSubmenu = document.getElementById('languageSettingsSubmenu'); // New language submenu
+        const backupRestoreSettingsSubmenu = document.getElementById('backupRestoreSettingsSubmenu');
 
         const openBackgroundSettingsButton = document.getElementById('openBackgroundSettings');
         const openPageTitleSettingsButton = document.getElementById('openPageTitleSettings');
@@ -670,95 +957,131 @@
         const openGridSettingsButton = document.getElementById('openGridSettings');
         const openButtonManagementButton = document.getElementById('openButtonManagement');
         const openSettingsButtonSettingsButton = document.getElementById('openSettingsButtonSettings');
-        const openBackupRestoreSettingsButton = document.getElementById('openBackupRestoreSettings'); // NEU: Open Backup/Restore Button
+        const openLanguageSettingsButton = document.getElementById('openLanguageSettings'); // New language settings button
+        const openBackupRestoreSettingsButton = document.getElementById('openBackupRestoreSettings');
 
         const backToMainMenuButtons = document.querySelectorAll('.back-to-main-menu-button');
 
-        // Neue DOM-Elemente für Einstellungs-Button-Einstellungen
         const settingsButtonPositionRadios = document.querySelectorAll('input[name="settingsButtonPosition"]');
         const settingsButtonDisplayRadios = document.querySelectorAll('input[name="settingsButtonDisplay"]');
 
-        // NEU: Elemente für Export/Import
+        const languageSelect = document.getElementById('languageSelect'); // New language select
+
         const exportSettingsButton = document.getElementById('exportSettingsButton');
         const importSettingsFile = document.getElementById('importSettingsFile');
         const importSettingsButton = document.getElementById('importSettingsButton');
         const importMessage = document.getElementById('importMessage');
-        const resetSettingsButton = document.getElementById('resetSettingsButton'); // NEU: Reset Button
+        const resetSettingsButton = document.getElementById('resetSettingsButton');
 
-        // NEU: Elemente für Bestätigungs-Modal
         const confirmationModal = document.getElementById('confirmationModal');
         const confirmationMessage = document.getElementById('confirmationMessage');
         const confirmYesButton = document.getElementById('confirmYesButton');
         const confirmNoButton = document.getElementById('confirmNoButton');
 
 
-        let currentButtons = []; // Aktueller Zustand der Buttons
-        let currentBackgroundColor = '#1a202c'; // Aktuelle Hintergrundfarbe (Standard: Tailwind gray-900)
-        let currentPageTitle = 'Willkommen auf deiner Startseite';
+        let currentButtons = [];
+        let currentBackgroundColor = '#1a202c';
+        let currentPageTitle = ''; // Will be set by localization
         let hidePageTitle = false;
-        let currentTabTitle = 'Meine Startseite'; // Neuer Zustand für Tab-Titel
-        let currentDefaultSearchProvider = 'google'; // Standardsuchanbieter aus den Einstellungen
-        let currentActiveSearchProvider = 'google'; // Aktuell ausgewählter Suchanbieter in der Schnellauswahl
-        let currentFaviconBase64 = ''; // Favicon als Base64-String
-        let selectedFileBase64 = null; // Temporäre Variable für die ausgewählte Datei für Button-Icons
+        let currentTabTitle = ''; // Will be set by localization
+        let currentDefaultSearchProvider = 'google';
+        let currentActiveSearchProvider = 'google';
+        let currentFaviconBase64 = '';
+        let selectedFileBase64 = null;
 
-
-        // Neue Variablen für Hintergrund
-        let currentBackgroundType = 'color'; // 'color', 'image', 'gradient'
+        let currentBackgroundType = 'color';
         let currentBackgroundImageUrl = '';
         let currentBackgroundImageBase64 = '';
-        let currentGradientColor1 = '#4F46E5'; // Standard-Gradientenfarben
+        let currentGradientColor1 = '#4F46E5';
         let currentGradientColor2 = '#EC4899';
         let currentGradientDirection = 'to right';
 
-        // Neue Variable für Schriftart des Seitentitels
         let currentPageTitleFont = 'Inter, sans-serif';
 
-        // Neue Variablen für Raster-Einstellungen
         let currentMaxColumns = 6;
         let currentBaseTileHeight = 150;
 
-        // Neue Variablen für Einstellungs-Button
-        let currentSettingsButtonPosition = 'bottom-right'; // Standardposition
-        let currentSettingsButtonDisplay = 'text'; // Standardanzeige: Text
+        let currentSettingsButtonPosition = 'bottom-right';
+        let currentSettingsButtonDisplay = 'text';
 
+        let currentLanguage = 'de'; // Default language
 
-        // Funktion zum Laden der Einstellungen aus dem Local Storage
+        let areButtonsLocked = true; // Set default to locked
+
+        // Global variable for the line indicator
+        let lineIndicator = null;
+
+        // Function to set the language of the UI
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('browserStartPageLanguage', lang);
+            document.documentElement.lang = lang; // Set HTML lang attribute
+
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Update all elements with data-i18n-placeholder attribute
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    element.placeholder = translations[lang][key];
+                }
+            });
+
+            // Update hardcoded texts not covered by data-i18n
+            pageTitleElement.textContent = currentPageTitle || translations[currentLanguage].pageTitleDefault;
+            document.title = currentTabTitle || translations[currentLanguage].browserTabTitleDefault;
+            settingsButton.textContent = translations[currentLanguage].settings;
+            document.getElementById('modalTitle').textContent = translations[currentLanguage].modalTitle;
+
+            // Update placeholder for search input based on current active search provider and selected language
+            googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+
+            // Re-render buttons to ensure their titles are updated if they refer to translations
+            renderButtons();
+        }
+
+        // Function to load settings from Local Storage
         function loadSettings() {
             try {
                 const storedButtons = localStorage.getItem('browserStartPageButtons');
                 const storedBgColor = localStorage.getItem('browserStartPageBgColor');
                 const storedPageTitle = localStorage.getItem('browserStartPageTitle');
                 const storedHidePageTitle = localStorage.getItem('browserStartPageHideTitle');
-                const storedTabTitle = localStorage.getItem('browserStartPageTabTitle'); // Lade Tab-Titel
-                const storedDefaultSearchProvider = localStorage.getItem('browserStartPageSearchProvider'); // Lade Standardsuchanbieter
+                const storedTabTitle = localStorage.getItem('browserStartPageTabTitle');
+                const storedDefaultSearchProvider = localStorage.getItem('browserStartPageSearchProvider');
                 const storedBackgroundType = localStorage.getItem('browserStartPageBackgroundType');
                 const storedBackgroundImageUrl = localStorage.getItem('browserStartPageBackgroundImageUrl');
                 const storedBackgroundImageBase64 = localStorage.getItem('browserStartPageBackgroundImageBase64');
                 const storedGradientColor1 = localStorage.getItem('browserStartPageGradientColor1');
-                const storedGradientColor2 = localStorage.getItem('browserStartPageGradientColor2');
+                const storedGradientColor2 = localStorage.getItem('browserStartPageGradientGradientColor2');
                 const storedGradientDirection = localStorage.getItem('browserStartPageGradientGradientDirection');
                 const storedPageTitleFont = localStorage.getItem('browserStartPageTitleFont');
                 const storedMaxColumns = localStorage.getItem('browserStartPageMaxColumns');
                 const storedBaseTileHeight = localStorage.getItem('browserStartPageBaseTileHeight');
                 const storedSettingsButtonPosition = localStorage.getItem('browserStartPageSettingsButtonPosition');
                 const storedSettingsButtonDisplay = localStorage.getItem('browserStartPageSettingsButtonDisplay');
-                const storedFaviconBase64 = localStorage.getItem('browserStartPageFavicon'); // Favicon laden
+                const storedFaviconBase64 = localStorage.getItem('browserStartPageFavicon');
+                const storedLanguage = localStorage.getItem('browserStartPageLanguage');
 
-
-                currentButtons = storedButtons ? JSON.parse(storedButtons) : JSON.parse(JSON.stringify(defaultButtons)); // Deep copy default buttons
+                currentButtons = storedButtons ? JSON.parse(storedButtons) : JSON.parse(JSON.stringify(defaultButtons));
                 currentBackgroundColor = storedBgColor || '#1a202c';
-                currentPageTitle = storedPageTitle !== null ? storedPageTitle : 'Willkommen auf deiner Startseite';
-                hidePageTitle = storedHidePageTitle === 'true'; // Convert string to boolean
-                currentTabTitle = storedTabTitle !== null ? storedTabTitle : 'Meine Startseite'; // Setze Tab-Titel
-                currentDefaultSearchProvider = storedDefaultSearchProvider || 'google'; // Setze Standardsuchanbieter
-                currentActiveSearchProvider = currentDefaultSearchProvider; // Aktiver Suchanbieter ist standardmäßig der Standardsuchanbieter
-                currentFaviconBase64 = storedFaviconBase64 || ''; // Favicon laden
+                currentPageTitle = storedPageTitle !== null ? storedPageTitle : ''; // Set by localization
+                hidePageTitle = storedHidePageTitle === 'true';
+                currentTabTitle = storedTabTitle !== null ? storedTabTitle : ''; // Set by localization
+                currentDefaultSearchProvider = storedDefaultSearchProvider || 'google';
+                currentActiveSearchProvider = currentDefaultSearchProvider;
+                currentFaviconBase64 = storedFaviconBase64 || '';
+                areButtonsLocked = true; // ALWAYS set to locked on load
 
-                // Hintergrund-Einstellungen laden
                 currentBackgroundType = storedBackgroundType || 'color';
                 currentBackgroundImageUrl = storedBackgroundImageUrl || '';
-                currentBackgroundImageBase64 = ''; // Base64-Zustand zurücksetzen, wenn URL vorhanden
+                currentBackgroundImageBase64 = '';
                 if (storedBackgroundImageBase64) {
                     currentBackgroundImageBase64 = storedBackgroundImageBase64;
                 } else if (storedBackgroundImageUrl) {
@@ -769,43 +1092,39 @@
                 currentGradientColor2 = storedGradientColor2 || '#EC4899';
                 currentGradientDirection = storedGradientDirection || 'to right';
 
-                // Seitentitel-Schriftart laden
                 currentPageTitleFont = storedPageTitleFont || 'Inter, sans-serif';
 
-                // Raster-Einstellungen laden
                 currentMaxColumns = parseInt(storedMaxColumns) || 6;
                 currentBaseTileHeight = parseInt(storedBaseTileHeight) || 150;
 
-                // Einstellungs-Button-Einstellungen laden
                 currentSettingsButtonPosition = storedSettingsButtonPosition || 'bottom-right';
                 currentSettingsButtonDisplay = storedSettingsButtonDisplay || 'text';
 
-                // Setze den Wert des Quick-Selects auf den aktuellen aktiven Suchanbieter
+                currentLanguage = storedLanguage || 'de'; // Load saved language, default to German
+
+                // Update quickSearchProviderSelect value
                 quickSearchProviderSelect.value = currentActiveSearchProvider;
-                // Setze den Placeholder der Suchleiste beim Laden der Seite
-                googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
 
-
-                // Sicherstellen, dass die Button-IDs eindeutig sind und ggf. neue generieren
+                // Ensure button structure consistency
                 currentButtons = currentButtons.map(btn => ({
                     ...btn,
                     id: btn.id || 'btn' + Math.random().toString(36).substr(2, 9),
-                    size: btn.size || '1x1', // Standardgröße, falls nicht vorhanden
-                    target: btn.target || '_self', // Standard-Link-Ziel, falls nicht vorhanden
+                    size: btn.size || '1x1',
+                    target: btn.target || '_self',
                 }));
 
-                // Wenn keine Buttons vorhanden sind, füge Standard-Buttons hinzu
                 if (currentButtons.length === 0) {
-                    currentButtons = JSON.parse(JSON.stringify(defaultButtons)); // Deep copy
+                    currentButtons = JSON.parse(JSON.stringify(defaultButtons));
                 }
 
             } catch (e) {
-                console.error("Fehler beim Laden der Einstellungen aus Local Storage:", e);
+                console.error("Error loading settings from Local Storage:", e);
+                // Reset to default values in case of error
                 currentButtons = JSON.parse(JSON.stringify(defaultButtons));
                 currentBackgroundColor = '#1a202c';
-                currentPageTitle = 'Willkommen auf deiner Startseite';
+                currentPageTitle = ''; // Set by localization
                 hidePageTitle = false;
-                currentTabTitle = 'Meine Startseite';
+                currentTabTitle = ''; // Set by localization
                 currentDefaultSearchProvider = 'google';
                 currentActiveSearchProvider = 'google';
                 currentFaviconBase64 = '';
@@ -820,21 +1139,23 @@
                 currentBaseTileHeight = 150;
                 currentSettingsButtonPosition = 'bottom-right';
                 currentSettingsButtonDisplay = 'text';
+                currentLanguage = 'de'; // Default to German
+                areButtonsLocked = true; // ALWAYS set to locked
             }
         }
 
-        // Funktion zum Speichern der Einstellungen im Local Storage
+        // Function to save settings to Local Storage
         function saveSettings() {
             try {
                 localStorage.setItem('browserStartPageButtons', JSON.stringify(currentButtons));
                 localStorage.setItem('browserStartPageBgColor', currentBackgroundColor);
                 localStorage.setItem('browserStartPageTitle', currentPageTitle);
                 localStorage.setItem('browserStartPageHideTitle', hidePageTitle);
-                localStorage.setItem('browserStartPageTabTitle', currentTabTitle); // Speichere Tab-Titel
-                localStorage.setItem('browserStartPageSearchProvider', currentDefaultSearchProvider); // Speichere Standardsuchanbieter
-                localStorage.setItem('browserStartPageFavicon', currentFaviconBase64); // Favicon speichern
+                localStorage.setItem('browserStartPageTabTitle', currentTabTitle);
+                localStorage.setItem('browserStartPageSearchProvider', currentDefaultSearchProvider);
+                localStorage.setItem('browserStartPageFavicon', currentFaviconBase64);
+                // areButtonsLocked is NOT saved here to avoid persisting the state
 
-                // Hintergrund-Einstellungen speichern
                 localStorage.setItem('browserStartPageBackgroundType', currentBackgroundType);
                 localStorage.setItem('browserStartPageBackgroundImageUrl', currentBackgroundImageUrl);
                 localStorage.setItem('browserStartPageBackgroundImageBase64', currentBackgroundImageBase64);
@@ -842,35 +1163,49 @@
                 localStorage.setItem('browserStartPageGradientColor2', currentGradientColor2);
                 localStorage.setItem('browserStartPageGradientDirection', currentGradientDirection);
 
-                // Seitentitel-Schriftart speichern
                 localStorage.setItem('browserStartPageTitleFont', currentPageTitleFont);
 
-                // Raster-Einstellungen speichern
                 localStorage.setItem('browserStartPageMaxColumns', currentMaxColumns);
                 localStorage.setItem('browserStartPageBaseTileHeight', currentBaseTileHeight);
 
-                // Einstellungs-Button-Einstellungen speichern
                 localStorage.setItem('browserStartPageSettingsButtonPosition', currentSettingsButtonPosition);
                 localStorage.setItem('browserStartPageSettingsButtonDisplay', currentSettingsButtonDisplay);
 
+                localStorage.setItem('browserStartPageLanguage', currentLanguage); // Save selected language
+
             } catch (e) {
-                console.error("Fehler beim Speichern der Einstellungen im Local Storage:", e);
+                console.error("Error saving settings to Local Storage:", e);
             }
         }
 
-        // Funktion zum Rendern der Buttons auf der Seite
+        // Function to render buttons on the page
         function renderButtons() {
-            tilesContainer.innerHTML = ''; // Vorhandene Buttons entfernen
-            currentButtons.forEach(button => {
-                const tile = document.createElement('a'); // Verwende <a> für Verlinkungen
-                tile.href = button.link;
-                tile.target = button.target || '_self'; // Setze das Link-Ziel
-                tile.className = `tile hover:scale-105 hover:shadow-lg rounded-xl`;
-                tile.setAttribute('data-id', button.id); // Speichert die ID für die Bearbeitung
-                tile.setAttribute('data-size', button.size); // Setzt die Größe für CSS-Styling
+            // Remove all existing tile elements (but not the lineIndicator)
+            const existingTiles = Array.from(tilesContainer.children).filter(
+                child => child.classList.contains('tile')
+            );
+            existingTiles.forEach(tile => tilesContainer.removeChild(tile));
 
-                // Setze die Hintergrundfarbe des Buttons immer
+            currentButtons.forEach(button => {
+                const tile = document.createElement('a');
+                tile.href = button.link;
+                tile.target = button.target || '_self';
+                tile.className = `tile hover:scale-105 hover:shadow-lg rounded-xl`;
+                tile.setAttribute('data-id', button.id);
+                tile.setAttribute('data-size', button.size);
+
                 tile.style.backgroundColor = button.color;
+
+                tile.draggable = !areButtonsLocked;
+
+                if (!areButtonsLocked) {
+                    tile.addEventListener('dragstart', handleDragStart);
+                    tile.addEventListener('click', (e) => {
+                        if (!areButtonsLocked) {
+                            e.preventDefault(); // Prevent navigation when buttons are unlocked (for drag/drop)
+                        }
+                    });
+                }
 
                 const img = document.createElement('img');
                 img.src = button.image;
@@ -878,43 +1213,288 @@
 
                 const title = document.createElement('h3');
                 title.textContent = button.title;
-                title.classList.add('hidden'); // Titel standardmäßig verstecken
+                title.classList.add('hidden'); // Hide by default, show if no image
 
-                // Füge Bild und Titel zum Button hinzu
                 tile.appendChild(img);
                 tile.appendChild(title);
 
-                // Überprüfe, ob ein gültiges Bild vorhanden ist
                 const isPlaceholderImage = !button.image ||
                                            button.image.includes('placehold.co/80x80/6B7280/FFFFFF?text=Icon') ||
-                                           button.image.includes('placehold.co/80x80/6B7280/FFFFFF?text=Neu');
+                                           button.image.includes('placehold.co/80x80/6B7280/FFFFFF?text=New');
 
                 if (isPlaceholderImage) {
-                    // Wenn kein echtes Bild vorhanden ist, zeige den Titel und entferne das img-Element
                     title.classList.remove('hidden');
-                    img.remove(); // Entferne das img-Element, da es nicht benötigt wird
+                    img.remove();
                 } else {
-                    // Wenn ein Bild vorhanden ist, versuche es zu laden
                     img.onload = () => {
-                        // Bild erfolgreich geladen, Titel bleibt versteckt
                         title.classList.add('hidden');
                     };
                     img.onerror = function() {
-                        // Bild konnte nicht geladen werden, zeige den Titel und entferne das img-Element
-                        this.remove(); // Entferne das img-Lement
-                        title.classList.remove('hidden'); // Zeige den Titel an
+                        this.remove(); // Remove broken image
+                        title.classList.remove('hidden'); // Show title instead
                     };
                 }
 
                 tilesContainer.appendChild(tile);
             });
+
+            // Ensure the lineIndicator is always the last child (for correct z-index)
+            if (lineIndicator && tilesContainer.lastChild !== lineIndicator) {
+                tilesContainer.appendChild(lineIndicator);
+            }
         }
 
-        // Funktion zum Anwenden der Seiten-Titel Einstellungen
+        // Drag & Drop Handler Functions
+        let draggedItemId = null;
+        let draggedItemSize = '1x1';
+
+        function handleDragStart(e) {
+            if (areButtonsLocked) {
+                e.preventDefault();
+                return;
+            }
+            draggedItemId = e.target.dataset.id;
+            draggedItemSize = e.target.dataset.size;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedItemId);
+            setTimeout(() => {
+                const originalDraggedElement = document.querySelector(`.tile[data-id="${draggedItemId}"]`);
+                if (originalDraggedElement) {
+                    originalDraggedElement.classList.add('opacity-0');
+                }
+            }, 0);
+
+            // Make the line indicator visible
+            lineIndicator.style.display = 'block';
+
+            // Add drag-active class to tilesContainer
+            tilesContainer.classList.add('drag-active');
+        }
+
+        function handleDragOver(e) {
+            if (areButtonsLocked) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const originalDraggedElement = document.querySelector(`.tile[data-id="${draggedItemId}"]`);
+            const currentTilesInDOM = Array.from(tilesContainer.children).filter(
+                child => child.nodeType === Node.ELEMENT_NODE && child.classList.contains('tile') && child !== originalDraggedElement && child !== lineIndicator
+            );
+
+            const tilesContainerRect = tilesContainer.getBoundingClientRect();
+            const computedStyle = getComputedStyle(tilesContainer);
+            const gap = parseFloat(computedStyle.gap);
+            const baseTileHeight = parseFloat(computedStyle.getPropertyValue('--base-tile-height'));
+            const lineHalfWidth = lineIndicator.offsetWidth / 2;
+
+            let insertIndex = currentButtons.length; // Default to inserting at the very end
+            let lineLeft = 0;
+            let lineTop = 0;
+            let lineHeight = baseTileHeight; // Default height for the indicator
+
+            let closestTile = null;
+            let minDistance = Infinity;
+
+            // Find the visually closest tile that is NOT the dragged element or the indicator itself
+            for (let i = 0; i < currentTilesInDOM.length; i++) {
+                const tile = currentTilesInDOM[i];
+                const rect = tile.getBoundingClientRect();
+
+                // Calculate distance from mouse to center of tile
+                const tileCenterX = rect.left + rect.width / 2;
+                const tileCenterY = rect.top + rect.height / 2;
+                const distance = Math.sqrt(Math.pow(e.clientX - tileCenterX, 2) + Math.pow(e.clientY - tileCenterY, 2));
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestTile = tile;
+                }
+            }
+
+            if (closestTile) {
+                const rect = closestTile.getBoundingClientRect();
+                // Positions relative to tilesContainer's top-left corner
+                const tileRelativeLeft = rect.left - tilesContainerRect.left;
+                const tileRelativeTop = rect.top - tilesContainerRect.top;
+
+                const insertBefore = e.clientX < rect.left + rect.width / 2;
+                const closestTileLogicalIndex = currentButtons.findIndex(btn => btn.id === closestTile.dataset.id);
+
+                lineTop = tileRelativeTop;
+                lineHeight = rect.height;
+
+                if (insertBefore) {
+                    lineLeft = tileRelativeLeft - (gap / 2) - lineHalfWidth;
+                    insertIndex = closestTileLogicalIndex;
+                } else {
+                    lineLeft = tileRelativeLeft + rect.width + (gap / 2) - lineHalfWidth;
+                    insertIndex = closestTileLogicalIndex + 1;
+                }
+
+            } else {
+                // If no closest tile found, determine if it's at the beginning or end of the grid.
+                const paddingLeft = parseFloat(computedStyle.paddingLeft);
+                const paddingTop = parseFloat(computedStyle.paddingTop);
+
+                // Mouse position relative to the tilesContainer
+                const mouseXRelativeToContainer = e.clientX - tilesContainerRect.left;
+                const mouseYRelativeToContainer = e.clientY - tilesContainerRect.top;
+
+                // If the grid is empty, always place at the very beginning
+                if (currentTilesInDOM.length === 0) {
+                    lineLeft = paddingLeft - lineHalfWidth;
+                    lineTop = paddingTop;
+                    lineHeight = baseTileHeight;
+                    insertIndex = 0;
+                } else {
+                    // Grid is not empty, but mouse is not over an existing tile.
+                    // Decide if it's logically before the first tile or after the last tile.
+                    const firstTile = currentTilesInDOM[0];
+                    const firstTileRect = firstTile.getBoundingClientRect();
+                    const lastTile = currentTilesInDOM[currentTilesInDOM.length - 1];
+                    const lastTileRect = lastTile.getBoundingClientRect();
+
+                    const firstTileRelativeLeft = firstTileRect.left - tilesContainerRect.left;
+                    const firstTileRelativeTop = firstTileRect.top - tilesContainerRect.top;
+                    const lastTileRelativeLeft = lastTileRect.left - tilesContainerRect.left;
+                    const lastTileRelativeTop = lastTileRect.top - tilesContainerRect.top;
+
+                    // Calculate logical row/column based on mouse position
+                    const currentMouseRow = Math.floor((mouseYRelativeToContainer - paddingTop) / (baseTileHeight + gap));
+                    const currentMouseCol = Math.floor((mouseXRelativeToContainer - paddingLeft) / (baseTileHeight + gap));
+
+                    // Find the last occupied row and column
+                    let lastOccupiedRow = 0;
+                    let lastOccupiedCol = 0;
+                    if (currentButtons.length > 0) {
+                        const lastButton = currentButtons[currentButtons.length - 1];
+                        // This calculation is a bit complex and depends on how your grid is filled.
+                        // A simpler approach for visual placement when outside a tile:
+                        // If mouse is generally to the left of the first tile
+                        if (mouseXRelativeToContainer < firstTileRelativeLeft) {
+                            lineLeft = paddingLeft - lineHalfWidth;
+                            lineTop = firstTileRelativeTop; // Stay on the first row's level
+                            insertIndex = 0;
+                        }
+                        // If mouse is generally to the right of the last tile
+                        else if (mouseXRelativeToContainer > lastTileRelativeLeft + lastTileRect.width) {
+                            lineLeft = lastTileRelativeLeft + lastTileRect.width + (gap / 2) - lineHalfWidth;
+                            lineTop = lastTileRelativeTop; // Stay on the last row's level
+                            insertIndex = currentButtons.length;
+                        }
+                        // If mouse is within the grid's horizontal bounds but not over a tile,
+                        // assume it's at the end of the current row or a new row.
+                        else {
+                            // This part needs more sophisticated grid-to-index mapping if precise
+                            // insertion in empty cells is desired. For now, default to end.
+                            lineLeft = lastTileRelativeLeft + lastTileRect.width + (gap / 2) - lineHalfWidth;
+                            lineTop = lastTileRelativeTop;
+                            insertIndex = currentButtons.length;
+                        }
+                    } else {
+                        // If no tiles at all, place at the very beginning
+                        lineLeft = paddingLeft - lineHalfWidth;
+                        lineTop = paddingTop;
+                        insertIndex = 0;
+                    }
+                }
+            }
+
+            // Ensure insertIndex is within valid bounds of the currentButtons array
+            insertIndex = Math.max(0, Math.min(insertIndex, currentButtons.length));
+
+            // Final clamping to ensure indicator stays within tilesContainer's visual boundaries
+            const containerPaddingLeft = parseFloat(computedStyle.paddingLeft);
+            const containerPaddingRight = parseFloat(computedStyle.paddingRight);
+            const containerPaddingTop = parseFloat(computedStyle.paddingTop);
+            const containerPaddingBottom = parseFloat(computedStyle.paddingBottom);
+
+            // Use tilesContainerRect.width/height for total dimensions, then subtract padding
+            const maxLineLeft = tilesContainerRect.width - containerPaddingRight - lineIndicator.offsetWidth;
+            const maxLineTop = tilesContainerRect.height - containerPaddingBottom - lineHeight;
+
+            lineLeft = Math.max(containerPaddingLeft - lineHalfWidth, Math.min(lineLeft, maxLineLeft));
+            lineTop = Math.max(containerPaddingTop, Math.min(lineTop, maxLineTop));
+
+            // Apply calculated styles
+            // Subtract 2px to shift left, compensating for the observed right shift
+            lineIndicator.style.left = `${lineLeft - 2}px`;
+            lineIndicator.style.top = `${lineTop}px`;
+            lineIndicator.style.height = `${lineHeight}px`;
+            lineIndicator.dataset.insertIndex = insertIndex;
+        }
+
+        function handleDrop(e) {
+            if (areButtonsLocked) return;
+            e.preventDefault();
+
+            const originalDraggedElement = document.querySelector(`.tile[data-id="${draggedItemId}"]`);
+            if (originalDraggedElement) {
+                originalDraggedElement.classList.remove('opacity-0'); // Make it visible again
+            }
+
+            // Hide the line indicator
+            lineIndicator.style.display = 'none';
+            // Remove drag-active class from tilesContainer
+            tilesContainer.classList.remove('drag-active');
+
+            const newIndex = parseInt(lineIndicator.dataset.insertIndex);
+
+            if (!isNaN(newIndex)) {
+                const draggedItemObject = currentButtons.find(btn => btn.id === draggedItemId);
+                if (!draggedItemObject) {
+                    console.error("Dragged item not found in currentButtons array.");
+                    return;
+                }
+
+                const originalIndexInArray = currentButtons.findIndex(btn => btn.id === draggedItemId);
+                currentButtons.splice(originalIndexInArray, 1); // Remove from original position
+
+                // Adjust newIndex if the original item was before the new drop position
+                let finalIndex = newIndex;
+                if (originalIndexInArray < newIndex) {
+                    finalIndex--; // If we removed an item before the target, the target index shifts left by 1
+                }
+
+                currentButtons.splice(finalIndex, 0, draggedItemObject);
+
+                saveSettings();
+                renderButtons(); // Re-render to reflect the new order
+            } else {
+                console.warn("Drop occurred without a valid insert index. Re-rendering without reordering.");
+                renderButtons();
+            }
+
+            draggedItemId = null;
+            draggedItemSize = '1x1';
+        }
+
+        function handleDragLeave(e) {
+            if (areButtonsLocked) return;
+            // The indicator should only hide on drop or dragend.
+        }
+
+        function handleDragEnd(e) {
+            if (areButtonsLocked) return;
+            const originalDraggedElement = document.querySelector(`.tile[data-id="${draggedItemId}"]`);
+            if (originalDraggedElement) {
+                originalDraggedElement.classList.remove('opacity-0');
+            }
+            // Hide the line indicator
+            lineIndicator.style.display = 'none';
+            draggedItemId = null;
+            draggedItemSize = '1x1';
+
+            // Remove drag-active class from tilesContainer
+            tilesContainer.classList.remove('drag-active');
+        }
+
+
+        // Function to apply page title settings
         function applyPageTitleSettings() {
-            pageTitleElement.textContent = currentPageTitle;
-            pageTitleElement.style.fontFamily = currentPageTitleFont; // Schriftart des Titels anwenden
-            pageTitleElement.style.textShadow = '0 0 5px rgba(0,0,0,0.7)'; // Halbschatten für den Titel
+            pageTitleElement.textContent = currentPageTitle || translations[currentLanguage].pageTitleDefault;
+            pageTitleElement.style.fontFamily = currentPageTitleFont;
+            pageTitleElement.style.textShadow = '0 0 5px rgba(0,0,0,0.7)';
             if (hidePageTitle) {
                 pageTitleElement.classList.add('hidden');
             } else {
@@ -922,12 +1502,12 @@
             }
         }
 
-        // Funktion zum Anwenden des Tab-Titels
+        // Function to apply tab title settings
         function applyTabTitleSettings() {
-            document.title = currentTabTitle;
+            document.title = currentTabTitle || translations[currentLanguage].browserTabTitleDefault;
         }
 
-        // Funktion zum Anwenden der Suchleisten-Position (simplified)
+        // Function to apply search bar position (simplified)
         function applySearchPosition() {
             // The main content wrapper is already flex-col and items-center justify-center.
             // This ensures the title, search bar, and tiles grid are vertically centered as a block.
@@ -935,10 +1515,10 @@
             // as its position within the main content flow is fixed (after title, before tiles).
         }
 
-        // Funktion zum Anwenden der Hintergrund-Einstellungen
+        // Function to apply background settings
         function applyBackgroundSettings() {
-            body.style.backgroundColor = ''; // CSS-Hintergrundfarbe zurücksetzen
-            body.style.backgroundImage = ''; // CSS-Hintergrundbild zurücksetzen
+            body.style.backgroundColor = '';
+            body.style.backgroundImage = '';
 
             if (currentBackgroundType === 'color') {
                 body.style.backgroundColor = currentBackgroundColor;
@@ -953,7 +1533,7 @@
             }
         }
 
-        // Funktion zum Anwenden der Raster-Einstellungen
+        // Function to apply grid settings
         function applyGridSettings() {
             tilesContainer.style.setProperty('--max-cols', currentMaxColumns);
 
@@ -964,60 +1544,73 @@
             currentButtons.forEach(button => {
                 const [width, height] = button.size.split('x').map(Number);
 
-                // Check if the button fits in the current row
                 if (currentColumn + width > currentMaxColumns) {
-                    // Move to the next row if it doesn't fit
                     currentRow++;
                     currentColumn = 0;
                 }
 
-                // Update maxRowOccupied based on the current button's height
                 maxRowOccupied = Math.max(maxRowOccupied, currentRow + height);
 
-                // Advance column for the next button
                 currentColumn += width;
             });
 
-            // Add 1 to maxRowOccupied to ensure an extra row is always available, preventing scrollbar
             const dynamicMaxRows = maxRowOccupied + 1;
             tilesContainer.style.setProperty('--max-rows', dynamicMaxRows);
 
             tilesContainer.style.setProperty('--base-tile-height', `${currentBaseTileHeight}px`);
         }
 
-        // Funktion zum Anwenden der Einstellungs-Button-Einstellungen
+        // Function to apply settings button settings
         function applySettingsButton() {
-            // Entferne alle Positions- und Anzeige-Klassen zuerst
-            settingsButton.classList.remove('settings-button-top-left', 'settings-button-top-right', 'settings-button-bottom-left', 'settings-button-bottom-right', 'icon-only');
-            settingsButton.style.top = ''; // CSS-Eigenschaften zurücksetzen
-            settingsButton.style.bottom = '';
-            settingsButton.style.left = '';
-            settingsButton.style.right = '';
+            controlButtonsContainer.classList.remove('container-top-left', 'container-top-right', 'container-bottom-left', 'container-bottom-right');
 
-            // Position anwenden
-            settingsButton.classList.add(`settings-button-${currentSettingsButtonPosition}`);
+            controlButtonsContainer.classList.add(`container-${currentSettingsButtonPosition}`);
 
-            // Anzeige-Typ anwenden
+            controlButtonsContainer.innerHTML = ''; // Clear existing buttons
+
+            // Append buttons based on position to control their order
+            if (currentSettingsButtonPosition === 'top-left' || currentSettingsButtonPosition === 'bottom-left') {
+                controlButtonsContainer.appendChild(settingsButton);
+                controlButtonsContainer.appendChild(toggleLockButtonsButton);
+            } else {
+                controlButtonsContainer.appendChild(toggleLockButtonsButton);
+                controlButtonsContainer.appendChild(settingsButton);
+            }
+
             if (currentSettingsButtonDisplay === 'icon') {
-                settingsButton.innerHTML = '<i class="fas fa-cog"></i>'; // Font Awesome Zahnrad-Icon
+                settingsButton.innerHTML = '<i class="fas fa-cog"></i>';
                 settingsButton.classList.add('icon-only');
             } else {
-                settingsButton.textContent = 'Einstellungen';
+                settingsButton.textContent = translations[currentLanguage].settings; // Localized text
+                settingsButton.classList.remove('icon-only');
             }
         }
 
-        // Funktion zum Anwenden des Favicons
+        // Function to apply lock button state
+        function applyToggleLockButtonState() {
+            if (areButtonsLocked) {
+                toggleLockButtonsButton.innerHTML = '<i class="fas fa-lock"></i>';
+                toggleLockButtonsButton.classList.remove('unlocked');
+                toggleLockButtonsButton.style.backgroundColor = '#4a5568';
+            } else {
+                toggleLockButtonsButton.innerHTML = '<i class="fas fa-unlock"></i>';
+                toggleLockButtonsButton.classList.add('unlocked');
+                toggleLockButtonsButton.style.backgroundColor = '#3B82F6';
+            }
+            renderButtons(); // Re-render buttons to update draggable attribute
+        }
+
+        // Function to apply favicon
         function applyFavicon() {
             if (currentFaviconBase64) {
                 faviconLink.href = currentFaviconBase64;
             } else {
-                faviconLink.href = ''; // Setze auf leer, wenn kein Favicon vorhanden
+                faviconLink.href = '';
             }
         }
 
-        // Funktion zum Anzeigen des jeweiligen Menüs/Untermenüs im Modal
+        // Function to display the respective menu/submenu in the modal
         function showMenu(menuToShow) {
-            // Alle Menüs/Untermenüs ausblenden
             mainSettingsMenu.classList.add('hidden');
             backgroundSettingsSubmenu.classList.add('hidden');
             pageTitleSettingsSubmenu.classList.add('hidden');
@@ -1025,41 +1618,36 @@
             gridSettingsSubmenu.classList.add('hidden');
             buttonManagementSubmenu.classList.add('hidden');
             settingsButtonSettingsSubmenu.classList.add('hidden');
-            backupRestoreSettingsSubmenu.classList.add('hidden'); // NEU: Backup/Restore Submenu ausblenden
+            languageSettingsSubmenu.classList.add('hidden'); // Hide new submenu
+            backupRestoreSettingsSubmenu.classList.add('hidden');
 
-            // Das gewünschte Menü anzeigen
             document.getElementById(menuToShow).classList.remove('hidden');
         }
 
-        // Funktion zum Öffnen des Einstellungs-Modals
         function openSettingsModal() {
-            settingsModal.style.display = 'flex'; // Modal anzeigen
-            showMenu('mainSettingsMenu'); // Hauptmenü zuerst anzeigen
+            settingsModal.style.display = 'flex';
+            showMenu('mainSettingsMenu'); // Always start with main menu
 
-            populateButtonSelect(); // Dropdown mit Buttons füllen
-            populateFontSelects(); // Schriftart-Dropdowns füllen
+            populateButtonSelect();
+            populateFontSelects();
 
-            // Aktuelle Werte in die Formularfelder laden (für alle Submenüs, da sie beim Speichern/Abbrechen global angewendet werden)
             bgColorPicker.value = currentBackgroundColor;
             pageTitleInput.value = currentPageTitle;
             hidePageTitleCheckbox.checked = hidePageTitle;
-            tabTitleInput.value = currentTabTitle; // Setze Tab-Titel im Input
-            searchProviderSelect.value = currentDefaultSearchProvider; // Setze Wert aus Standardsuchanbieter
-            pageTitleFontSelect.value = currentPageTitleFont; // Seitentitel-Schriftart setzen
-            faviconPreview.src = currentFaviconBase64; // Favicon-Vorschau setzen
+            tabTitleInput.value = currentTabTitle;
+            searchProviderSelect.value = currentDefaultSearchProvider;
+            pageTitleFontSelect.value = currentPageTitleFont;
+            faviconPreview.src = currentFaviconBase64;
 
-            // Hintergrund-Einstellungen im Modal setzen
             backgroundTypeSelect.value = currentBackgroundType;
             backgroundImageUrl.value = currentBackgroundImageUrl;
-            gradientColor1.value = gradientColor1.value;
-            gradientColor2.value = gradientColor2.value;
-            gradientDirection.value = gradientDirection.value;
+            gradientColor1.value = currentGradientColor1;
+            gradientColor2.value = currentGradientColor2;
+            gradientDirection.value = currentGradientDirection;
 
-            // Raster-Einstellungen im Modal setzen
             maxColumnsInput.value = currentMaxColumns;
             baseTileHeightInput.value = currentBaseTileHeight;
 
-            // Einstellungs-Button-Einstellungen im Modal setzen
             settingsButtonPositionRadios.forEach(radio => {
                 radio.checked = radio.value === currentSettingsButtonPosition;
             });
@@ -1067,8 +1655,8 @@
                 radio.checked = radio.value === currentSettingsButtonDisplay;
             });
 
+            languageSelect.value = currentLanguage; // Set selected language in dropdown
 
-            // Vorschau für Hintergrundbild setzen
             if (currentBackgroundType === 'image') {
                 if (currentBackgroundImageBase64) {
                     currentBackgroundPreview.src = currentBackgroundImageBase64;
@@ -1080,51 +1668,41 @@
             } else {
                 currentBackgroundPreview.src = '';
             }
-            // Temporären Base64-Zustand für Button-Icons zurücksetzen
             selectedFileBase64 = null;
 
-            // Sichtbarkeit der Hintergrund-Optionen steuern
             toggleBackgroundOptions();
 
-            // Formular für Button-Details ausblenden, da anfangs kein Button ausgewählt ist
             buttonSelect.value = '';
             buttonEditForm.classList.add('hidden');
             currentButtonImagePreview.src = '';
 
-            // Import-Nachricht zurücksetzen
             importMessage.textContent = '';
-            importSettingsFile.value = ''; // Dateiauswahl zurücksetzen
+            importSettingsFile.value = '';
         }
 
-        // Funktion zum Schließen des Einstellungs-Modals
         function closeSettingsModal() {
-            settingsModal.style.display = 'none'; // Modal verstecken
-            // Alle Buttons im Einstellungs-Modal wieder aktivieren, wenn es geschlossen wird
+            settingsModal.style.display = 'none';
             cancelSettingsButton.disabled = false;
             saveSettingsButton.disabled = false;
             exportSettingsButton.disabled = false;
             importSettingsButton.disabled = false;
             importSettingsFile.disabled = false;
             resetSettingsButton.disabled = false;
-            // Auch Import-Nachricht zurücksetzen
             importMessage.textContent = '';
-            importMessage.style.color = ''; // Farbe zurücksetzen
+            importMessage.style.color = '';
         }
 
-        // Funktion zum Füllen des Button-Auswahl-Dropdowns
         function populateButtonSelect() {
-            buttonSelect.innerHTML = '<option value="">- Button auswählen -</option>'; // Standardoption
+            buttonSelect.innerHTML = `<option value="">- ${translations[currentLanguage].selectButtonToEdit} -</option>`;
             currentButtons.forEach((button) => {
                 const option = document.createElement('option');
-                option.value = button.id; // Verwende die ID als Wert
+                option.value = button.id;
                 option.textContent = button.title;
                 buttonSelect.appendChild(option);
             });
         }
 
-        // Funktion zum Füllen der Schriftart-Dropdowns
         function populateFontSelects() {
-            // Seitentitel-Schriftart
             pageTitleFontSelect.innerHTML = '';
             availableFonts.forEach(font => {
                 const option = document.createElement('option');
@@ -1135,7 +1713,6 @@
         }
 
 
-        // Funktion zur Steuerung der Sichtbarkeit der Hintergrund-Optionen
         function toggleBackgroundOptions() {
             const selectedType = backgroundTypeSelect.value;
             backgroundColorOptions.classList.add('hidden');
@@ -1151,10 +1728,8 @@
             }
         }
 
-        // Event-Listener für die Auswahl des Hintergrundtyps
         backgroundTypeSelect.addEventListener('change', toggleBackgroundOptions);
 
-        // Event-Listener für die Dateiauswahl des Hintergrundbildes
         backgroundImageFile.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -1162,47 +1737,41 @@
                 reader.onload = (e) => {
                     currentBackgroundImageBase64 = e.target.result;
                     currentBackgroundPreview.src = currentBackgroundImageBase64;
-                    backgroundImageUrl.value = ''; // URL-Feld leeren, wenn Datei ausgewählt
+                    backgroundImageUrl.value = '';
                 };
                 reader.readAsDataURL(file);
             } else {
                 currentBackgroundImageBase64 = '';
-                // Wenn keine Datei ausgewählt ist, bleibt die Vorschau, wie sie war
             }
         });
 
-        // Event-Listener für die URL-Eingabe des Hintergrundbildes
         backgroundImageUrl.addEventListener('input', () => {
             currentBackgroundImageUrl = backgroundImageUrl.value;
             currentBackgroundPreview.src = currentBackgroundImageUrl;
-            backgroundImageFile.value = ''; // Datei-Feld leeren, wenn URL eingegeben
-            currentBackgroundImageBase64 = ''; // Base64-Zustand zurücksetzen
+            backgroundImageFile.value = '';
+            currentBackgroundImageBase64 = '';
         });
 
-        // Event-Listener für die Dateiauswahl des Button-Icons
         buttonImageInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    selectedFileBase64 = e.target.result; // Speichert die Base64-Repräsentation
-                    currentButtonImagePreview.src = selectedFileBase64; // Zeigt die Vorschau an
+                    selectedFileBase64 = e.target.result;
+                    currentButtonImagePreview.src = selectedFileBase64;
                 };
                 reader.readAsDataURL(file);
             } else {
                 selectedFileBase64 = null;
-                // Wenn keine Datei ausgewählt ist, bleibt die Vorschau, wie sie war
             }
         });
 
-        // Event-Listener für den "Bild löschen" Button
         clearButtonImage.addEventListener('click', () => {
-            currentButtonImagePreview.src = ''; // Bildvorschau leeren
-            buttonImageInput.value = ''; // Dateiauswahl zurücksetzen
-            selectedFileBase64 = ''; // Temporären Zustand leeren
+            currentButtonImagePreview.src = '';
+            buttonImageInput.value = '';
+            selectedFileBase64 = '';
         });
 
-        // Event-Listener für die Favicon-Dateiauswahl
         faviconFileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -1217,7 +1786,6 @@
             }
         });
 
-        // Event-Listener für die Auswahl eines Buttons im Modal
         buttonSelect.addEventListener('change', (event) => {
             const selectedId = event.target.value;
             if (selectedId) {
@@ -1226,120 +1794,95 @@
                     buttonTitleInput.value = selectedButton.title;
                     buttonLinkInput.value = selectedButton.link;
                     buttonColorInput.value = selectedButton.color;
-                    buttonSizeSelect.value = selectedButton.size; // Setzt die Größe im Dropdown
-                    buttonTargetSelect.value = selectedButton.target || '_self'; // Setzt das Link-Ziel im Dropdown
+                    buttonSizeSelect.value = selectedButton.size;
+                    buttonTargetSelect.value = selectedButton.target || '_self';
 
-                    // Dateieingabe für Bild zurücksetzen
                     buttonImageInput.value = '';
-                    // Vorschau anzeigen
                     currentButtonImagePreview.src = selectedButton.image;
-                    // Wichtig: Speichere das aktuelle Bild in selectedFileBase64,
-                    // damit es beim Speichern erhalten bleibt, wenn kein neues Bild ausgewählt wird.
                     selectedFileBase64 = selectedButton.image;
 
-                    buttonEditForm.classList.remove('hidden'); // Formular anzeigen
+                    buttonEditForm.classList.remove('hidden');
                 }
             } else {
-                buttonEditForm.classList.add('hidden'); // Formular ausblenden, wenn nichts ausgewählt ist
-                buttonImageInput.value = ''; // Datei-Input leeren
-                currentButtonImagePreview.src = ''; // Bildvorschau leeren
-                selectedFileBase64 = null; // Zurücksetzen, wenn kein Button ausgewählt ist
+                buttonEditForm.classList.add('hidden');
+                buttonImageInput.value = '';
+                currentButtonImagePreview.src = '';
+                selectedFileBase64 = null;
             }
         });
 
-        // Event-Listener für den "Button hinzufügen"-Button
         addButton.addEventListener('click', () => {
-            const newId = 'btn' + Date.now(); // Eindeutige ID generieren
+            const newId = 'btn' + Date.now();
             const newButton = {
                 id: newId,
-                title: 'Neuer Button',
+                title: translations[currentLanguage].buttonTitle, // Localized default title
                 link: 'https://www.example.com',
-                image: '', // Standardmäßig kein Bild
+                image: '',
                 color: '#6B7280',
                 size: '1x1',
-                target: '_self', // Standard-Link-Ziel für neue Buttons
+                target: '_self',
             };
             currentButtons.push(newButton);
-            populateButtonSelect(); // Dropdown aktualisieren
-            buttonSelect.value = newId; // Neuen Button auswählen
-            buttonSelect.dispatchEvent(new Event('change')); // Change-Event auslösen, um Formular zu füllen
+            populateButtonSelect();
+            buttonSelect.value = newId;
+            buttonSelect.dispatchEvent(new Event('change'));
         });
 
-        // Event-Listener für den "Ausgewählten Button entfernen"-Button
         removeButton.addEventListener('click', () => {
             const selectedId = buttonSelect.value;
-            if (selectedId && currentButtons.length > 0) { // Erlaubt das Entfernen bis zum letzten Button
+            if (selectedId && currentButtons.length > 0) {
                 currentButtons = currentButtons.filter(btn => btn.id !== selectedId);
-                populateButtonSelect(); // Dropdown aktualisieren
-                buttonSelect.value = ''; // Auswahl zurücksetzen
-                buttonEditForm.classList.add('hidden'); // Formular ausblenden
-                currentButtonImagePreview.src = ''; // Bildvorschau leeren
+                populateButtonSelect();
+                buttonSelect.value = '';
+                buttonEditForm.classList.add('hidden');
+                currentButtonImagePreview.src = '';
             } else if (currentButtons.length === 0) {
-                console.warn("Keine Buttons zum Entfernen vorhanden.");
-                // Hier könnte eine Benachrichtigung an den Benutzer angezeigt werden
+                console.warn("No buttons to remove.");
             }
         });
 
-        // Event-Listener für den "Speichern"-Button im Modal
         saveSettingsButton.addEventListener('click', () => {
             const selectedId = buttonSelect.value;
             if (selectedId) {
-                // Button-Details aktualisieren
                 const buttonIndex = currentButtons.findIndex(btn => btn.id === selectedId);
                 if (buttonIndex !== -1) {
                     currentButtons[buttonIndex].title = buttonTitleInput.value;
                     currentButtons[buttonIndex].link = buttonLinkInput.value;
                     currentButtons[buttonIndex].color = buttonColorInput.value;
-                    currentButtons[buttonIndex].size = buttonSizeSelect.value; // Speichert die ausgewählte Größe
-                    currentButtons[buttonIndex].target = buttonTargetSelect.value; // Speichert das ausgewählte Link-Ziel
+                    currentButtons[buttonIndex].size = buttonSizeSelect.value;
+                    currentButtons[buttonIndex].target = buttonTargetSelect.value;
 
-                    // Bild aktualisieren: Verwende selectedFileBase64, das entweder das neu ausgewählte Bild
-                    // oder das ursprünglich vorhandene Bild enthält.
-                    // Wenn selectedFileBase64 leer ist (z.B. wenn der Button ursprünglich kein Bild hatte
-                    // und keines hinzugefügt wurde, oder wenn die Bild-URL explizit gelöscht wurde),
-                    // dann setze das Bild auf einen leeren String.
                     currentButtons[buttonIndex].image = selectedFileBase64 || '';
                 }
             }
 
-            // Seiten-Titel Einstellungen aktualisieren
             currentPageTitle = pageTitleInput.value;
             hidePageTitle = hidePageTitleCheckbox.checked;
-            currentTabTitle = tabTitleInput.value; // Tab-Titel aktualisieren
-            currentPageTitleFont = pageTitleFontSelect.value; // Seitentitel-Schriftart speichern
+            currentTabTitle = tabTitleInput.value;
+            currentPageTitleFont = pageTitleFontSelect.value;
 
-            // Suchleiste Einstellungen aktualisieren
-            currentDefaultSearchProvider = searchProviderSelect.value; // Standardsuchanbieter aktualisieren
-            currentActiveSearchProvider = currentDefaultSearchProvider; // Aktiver Suchanbieter wird zum Standardsuchanbieter
+            currentDefaultSearchProvider = searchProviderSelect.value;
+            currentActiveSearchProvider = currentDefaultSearchProvider;
 
-            // Aktualisiere die Schnellauswahl in der Suchleiste und den Placeholder
-            quickSearchProviderSelect.value = currentActiveSearchProvider;
-            googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
-
-
-            // Hintergrund-Einstellungen aktualisieren
             currentBackgroundType = backgroundTypeSelect.value;
             if (currentBackgroundType === 'color') {
                 currentBackgroundColor = bgColorPicker.value;
                 currentBackgroundImageUrl = '';
                 currentBackgroundImageBase64 = '';
             } else if (currentBackgroundType === 'image') {
-                // backgroundImageUrl und currentBackgroundImageBase64 werden bereits durch ihre Event-Listener aktualisiert
-                currentBackgroundColor = ''; // Farbe zurücksetzen
+                currentBackgroundColor = '';
             } else if (currentBackgroundType === 'gradient') {
                 currentGradientColor1 = gradientColor1.value;
                 currentGradientColor2 = gradientColor2.value;
                 currentGradientDirection = gradientDirection.value;
-                currentBackgroundColor = ''; // Farbe zurücksetzen
-                currentBackgroundImageUrl = ''; // Bild-URL zurücksetzen
-                currentBackgroundImageBase64 = ''; // Base64-Bild zurücksetzen
+                currentBackgroundColor = '';
+                currentBackgroundImageUrl = '';
+                currentBackgroundImageBase64 = '';
             }
 
-            // Raster-Einstellungen aktualisieren
             currentMaxColumns = parseInt(maxColumnsInput.value);
             currentBaseTileHeight = parseInt(baseTileHeightInput.value);
 
-            // Einstellungs-Button-Einstellungen aktualisieren
             settingsButtonPositionRadios.forEach(radio => {
                 if (radio.checked) {
                     currentSettingsButtonPosition = radio.value;
@@ -1351,64 +1894,68 @@
                 }
             });
 
+            // Language selection is handled immediately by the change event listener
+            // (languageSelect.addEventListener('change', ...))
 
-            saveSettings(); // Einstellungen speichern
-            renderButtons(); // Buttons neu rendern
-            applyPageTitleSettings(); // Seiten-Titel anwenden
-            applyTabTitleSettings(); // Tab-Titel anwenden
-            applySearchPosition(); // Suchleisten-Position anwenden
-            applyBackgroundSettings(); // Hintergrund anwenden
-            applyGridSettings(); // Raster-Einstellungen anwenden
-            applySettingsButton(); // Einstellungs-Button anwenden
-            applyFavicon(); // Favicon anwenden
-            closeSettingsModal(); // Modal schließen
+            saveSettings();
+            applyPageTitleSettings();
+            applyTabTitleSettings();
+            applySearchPosition();
+            applyBackgroundSettings();
+            applyGridSettings();
+            applySettingsButton();
+            applyFavicon();
+            renderButtons(); // Re-render to ensure any title changes are reflected immediately
+            closeSettingsModal();
         });
 
-        // Event-Listener für den "Abbrechen"-Button im Modal
         cancelSettingsButton.addEventListener('click', () => {
-            closeSettingsModal(); // Modal schließen
+            closeSettingsModal();
         });
 
-        // Event-Listener für den Einstellungs-Button
-        settingsButton.addEventListener('click', openSettingsModal);
+        // Function to perform search
+        function performSearch() {
+            const query = googleSearchInput.value.trim();
+            if (query) {
+                const selectedSearchProvider = quickSearchProviderSelect.value;
+                const searchUrl = searchProviders[selectedSearchProvider] + encodeURIComponent(query);
+                window.location.href = searchUrl;
+            }
+        }
 
-        // Event-Listener für die Google-Suchleiste (jetzt allgemeiner Suchleisten-Input)
         googleSearchInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                const query = googleSearchInput.value.trim();
-                if (query) {
-                    // Verwende den Wert aus dem Quick-Select für die Suche
-                    const selectedSearchProvider = quickSearchProviderSelect.value;
-                    const searchUrl = searchProviders[selectedSearchProvider] + encodeURIComponent(query);
-                    window.location.href = searchUrl;
-                }
+                performSearch();
             }
         });
 
-        // Event-Listener für die Schnellauswahl des Suchanbieters
-        quickSearchProviderSelect.addEventListener('change', () => {
-            const selectedProvider = quickSearchProviderSelect.value;
-            googleSearchInput.placeholder = searchPlaceholders[selectedProvider];
-            currentActiveSearchProvider = selectedProvider; // Aktualisiere nur den aktiven Suchanbieter
-            // Die Standardsuchmaschine in den Einstellungen wird hier nicht direkt beeinflusst.
-            // Sie wird nur aktualisiert, wenn die Einstellungen explizit gespeichert werden.
-        });
-
-        // Event-Listener für Kategorie-Buttons
+        // Event listeners for submenu navigation
         openBackgroundSettingsButton.addEventListener('click', () => showMenu('backgroundSettingsSubmenu'));
         openPageTitleSettingsButton.addEventListener('click', () => showMenu('pageTitleSettingsSubmenu'));
         openSearchBarSettingsButton.addEventListener('click', () => showMenu('searchBarSettingsSubmenu'));
         openGridSettingsButton.addEventListener('click', () => showMenu('gridSettingsSubmenu'));
         openButtonManagementButton.addEventListener('click', () => showMenu('buttonManagementSubmenu'));
         openSettingsButtonSettingsButton.addEventListener('click', () => showMenu('settingsButtonSettingsSubmenu'));
-        openBackupRestoreSettingsButton.addEventListener('click', () => showMenu('backupRestoreSettingsSubmenu')); // NEU: Event-Listener für Backup/Restore
+        openLanguageSettingsButton.addEventListener('click', () => showMenu('languageSettingsSubmenu')); // New listener for language settings
+        openBackupRestoreSettingsButton.addEventListener('click', () => showMenu('backupRestoreSettingsSubmenu'));
 
-        // Event-Listener für "Zurück"-Buttons
         backToMainMenuButtons.forEach(button => {
             button.addEventListener('click', () => showMenu('mainSettingsMenu'));
         });
 
-        // NEU: Export-Funktionalität
+        // Language selection listener
+        languageSelect.addEventListener('change', (event) => {
+            setLanguage(event.target.value);
+            // After changing language, update placeholders again
+            googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+            // Also update any other hardcoded elements if necessary
+            settingsButton.textContent = translations[currentLanguage].settings; // Re-set the settings button text
+            document.getElementById('modalTitle').textContent = translations[currentLanguage].modalTitle;
+            // Re-populate button select to update option text for "Select Button to Edit"
+            populateButtonSelect();
+        });
+
+
         exportSettingsButton.addEventListener('click', () => {
             const settingsToExport = {
                 buttons: currentButtons,
@@ -1428,53 +1975,51 @@
                 maxColumns: currentMaxColumns,
                 baseTileHeight: currentBaseTileHeight,
                 settingsButtonPosition: currentSettingsButtonPosition,
-                settingsButtonDisplay: currentSettingsButtonDisplay
+                settingsButtonDisplay: currentSettingsButtonDisplay,
+                language: currentLanguage, // Export current language
+                areButtonsLocked: areButtonsLocked // This will export the current state, but not load it back by default
             };
 
-            const dataStr = JSON.stringify(settingsToExport, null, 2); // Schön formatiertes JSON
+            const dataStr = JSON.stringify(settingsToExport, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'browser_startpage_settings.json';
-            document.body.appendChild(a); // Temporär zum DOM hinzufügen
-            a.click(); // Klick simulieren
-            document.body.removeChild(a); // Entfernen
-            URL.revokeObjectURL(url); // URL freigeben
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         });
 
-        // NEU: Import-Funktionalität
         importSettingsButton.addEventListener('click', () => {
             const file = importSettingsFile.files[0];
             if (!file) {
-                importMessage.textContent = 'Bitte wählen Sie eine JSON-Datei aus.';
+                importMessage.textContent = translations[currentLanguage].pleaseSelectJson;
                 return;
             }
 
-            // Buttons deaktivieren, um Unterbrechungen zu verhindern
             cancelSettingsButton.disabled = true;
             saveSettingsButton.disabled = true;
-            exportSettingsButton.disabled = true; // Export-Button auch deaktivieren
-            importSettingsButton.disabled = true; // Auch den Import-Button selbst deaktivieren
-            importSettingsFile.disabled = true; // Dateiauswahlfeld deaktivieren
-            resetSettingsButton.disabled = true; // Reset-Button deaktivieren
+            exportSettingsButton.disabled = true;
+            importSettingsButton.disabled = true;
+            importSettingsFile.disabled = true;
+            resetSettingsButton.disabled = true;
 
-            importMessage.textContent = 'Import wird gestartet... Bitte warten.';
-            importMessage.style.color = '#FFFFFF'; // Neutrale Farbe für den Ladezustand
+            importMessage.textContent = translations[currentLanguage].importingSettings;
+            importMessage.style.color = '#FFFFFF';
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const importedSettings = JSON.parse(e.target.result);
 
-                    // Grundlegende Validierung der importierten Daten
                     if (importedSettings && typeof importedSettings === 'object' && Array.isArray(importedSettings.buttons)) {
-                        // Importierte Einstellungen in Local Storage speichern
                         localStorage.setItem('browserStartPageButtons', JSON.stringify(importedSettings.buttons));
                         localStorage.setItem('browserStartPageBgColor', importedSettings.bgColor || '#1a202c');
-                        localStorage.setItem('browserStartPageTitle', importedSettings.pageTitle !== undefined ? importedSettings.pageTitle : 'Willkommen auf deiner Startseite');
+                        localStorage.setItem('browserStartPageTitle', importedSettings.pageTitle !== undefined ? importedSettings.pageTitle : '');
                         localStorage.setItem('browserStartPageHideTitle', importedSettings.hidePageTitle !== undefined ? importedSettings.hidePageTitle : false);
-                        localStorage.setItem('browserStartPageTabTitle', importedSettings.tabTitle !== undefined ? importedSettings.tabTitle : 'Meine Startseite');
+                        localStorage.setItem('browserStartPageTabTitle', importedSettings.tabTitle !== undefined ? importedSettings.tabTitle : '');
                         localStorage.setItem('browserStartPageSearchProvider', importedSettings.defaultSearchProvider || 'google');
                         localStorage.setItem('browserStartPageFavicon', importedSettings.faviconBase64 || '');
                         localStorage.setItem('browserStartPageBackgroundType', importedSettings.backgroundType || 'color');
@@ -1488,17 +2033,17 @@
                         localStorage.setItem('browserStartPageBaseTileHeight', importedSettings.baseTileHeight !== undefined ? importedSettings.baseTileHeight : 150);
                         localStorage.setItem('browserStartPageSettingsButtonPosition', importedSettings.settingsButtonPosition || 'bottom-right');
                         localStorage.setItem('browserStartPageSettingsButtonDisplay', importedSettings.settingsButtonDisplay || 'text');
+                        localStorage.setItem('browserStartPageLanguage', importedSettings.language || 'de'); // Import language
 
-                        importMessage.textContent = 'Einstellungen erfolgreich importiert! Die Seite wird neu geladen...';
-                        importMessage.style.color = '#48BB78'; // Grün für Erfolg
+                        importMessage.textContent = translations[importedSettings.language || 'de'].settingsImported;
+                        importMessage.style.color = '#48BB78';
                         setTimeout(() => {
-                            location.reload(); // Seite neu laden, um die neuen Einstellungen anzuwenden
+                            location.reload();
                         }, 1500);
 
                     } else {
-                        importMessage.textContent = 'Ungültiges Dateiformat. Bitte wählen Sie eine gültige Einstellungen-JSON-Datei.';
-                        importMessage.style.color = '#F56565'; // Rot für Fehler
-                        // Buttons bei Fehler wieder aktivieren
+                        importMessage.textContent = translations[currentLanguage].invalidFileFormat;
+                        importMessage.style.color = '#F56565';
                         cancelSettingsButton.disabled = false;
                         saveSettingsButton.disabled = false;
                         exportSettingsButton.disabled = false;
@@ -1507,10 +2052,9 @@
                         resetSettingsButton.disabled = false;
                     }
                 } catch (error) {
-                    console.error('Fehler beim Parsen der importierten Datei:', error);
-                    importMessage.textContent = 'Fehler beim Lesen der Datei. Stellen Sie sicher, dass es eine gültige JSON-Datei ist.';
-                    importMessage.style.color = '#F56565'; // Rot für Fehler
-                    // Buttons bei Fehler wieder aktivieren
+                    console.error('Error parsing imported file:', error);
+                    importMessage.textContent = translations[currentLanguage].errorReadingFile;
+                    importMessage.style.color = '#F56565';
                     cancelSettingsButton.disabled = false;
                     saveSettingsButton.disabled = false;
                     exportSettingsButton.disabled = false;
@@ -1522,16 +2066,13 @@
             reader.readAsText(file);
         });
 
-        // Funktion zum Anzeigen des benutzerdefinierten Bestätigungs-Modals
         function showConfirmationModal(message, onConfirmCallback) {
             confirmationMessage.textContent = message;
             confirmationModal.style.display = 'flex';
 
-            // Deaktiviere Interaktion mit dem darunterliegenden Einstellungs-Modal
             settingsModal.style.pointerEvents = 'none';
-            settingsModal.style.opacity = '0.5'; // Visuell anzeigen, dass es deaktiviert ist
+            settingsModal.style.opacity = '0.5';
 
-            // Vorherige Listener entfernen, um Mehrfachausführung zu verhindern
             confirmYesButton.onclick = null;
             confirmNoButton.onclick = null;
 
@@ -1542,7 +2083,6 @@
 
             confirmNoButton.onclick = () => {
                 hideConfirmationModal();
-                // Buttons im Haupt-Einstellungs-Modal wieder aktivieren, wenn Bestätigung abgebrochen wird
                 cancelSettingsButton.disabled = false;
                 saveSettingsButton.disabled = false;
                 exportSettingsButton.disabled = false;
@@ -1552,17 +2092,13 @@
             };
         }
 
-        // Funktion zum Ausblenden des benutzerdefinierten Bestätigungs-Modals
         function hideConfirmationModal() {
             confirmationModal.style.display = 'none';
-            // Interaktion mit dem darunterliegenden Einstellungs-Modal wieder aktivieren
             settingsModal.style.pointerEvents = 'auto';
             settingsModal.style.opacity = '1';
         }
 
-        // NEU: Reset-Funktionalität
         resetSettingsButton.addEventListener('click', () => {
-            // Buttons sofort deaktivieren, wenn Reset initiiert wird
             cancelSettingsButton.disabled = true;
             saveSettingsButton.disabled = true;
             exportSettingsButton.disabled = true;
@@ -1570,11 +2106,9 @@
             importSettingsFile.disabled = true;
             resetSettingsButton.disabled = true;
 
-            // Import-Nachricht leeren, wenn Bestätigung geöffnet wird
             importMessage.textContent = '';
 
-            showConfirmationModal('Möchten Sie wirklich alle Einstellungen auf den Ursprungszustand zurücksetzen? Dies kann nicht rückgängig gemacht werden.', () => {
-                // Dies ist die eigentliche Reset-Logik, die nur ausgeführt wird, wenn 'Ja' geklickt wird
+            showConfirmationModal(translations[currentLanguage].confirmReset, () => {
                 localStorage.removeItem('browserStartPageButtons');
                 localStorage.removeItem('browserStartPageBgColor');
                 localStorage.removeItem('browserStartPageTitle');
@@ -1593,34 +2127,73 @@
                 localStorage.removeItem('browserStartPageBaseTileHeight');
                 localStorage.removeItem('browserStartPageSettingsButtonPosition');
                 localStorage.removeItem('browserStartPageSettingsButtonDisplay');
+                localStorage.removeItem('browserStartPageLanguage'); // Remove stored language
+                localStorage.removeItem('browserStartPageAreButtonsLocked'); // This removes the stored lock state
 
-                importMessage.textContent = 'Einstellungen zurückgesetzt! Die Seite wird neu geladen...';
-                importMessage.style.color = '#48BB78'; // Grün für Erfolg
+                importMessage.textContent = translations[currentLanguage].settingsReset;
+                importMessage.style.color = '#48BB78';
                 setTimeout(() => {
-                    location.reload(); // Seite neu laden, um die Standardeinstellungen anzuwenden
+                    location.reload();
                 }, 1500);
             });
         });
 
 
-        // Initialisierungsfunktion, die beim Laden der Seite aufgerufen wird
         function init() {
-            loadSettings(); // Einstellungen laden
-            applyBackgroundSettings(); // Hintergrund anwenden
-            applyPageTitleSettings(); // Seiten-Titel anwenden
-            applyTabTitleSettings(); // Tab-Titel anwenden
-            applySearchPosition(); // Suchleisten-Position anwenden
-            applyGridSettings(); // Raster-Einstellungen anwenden
-            applySettingsButton(); // Einstellungs-Button anwenden
-            applyFavicon(); // Favicon anwenden
-            renderButtons(); // Buttons rendern
+            // Initialize DOM elements here after DOM is loaded
+            settingsButton = document.getElementById('settingsButton');
+            toggleLockButtonsButton = document.getElementById('toggleLockButtonsButton');
+            controlButtonsContainer = document.getElementById('controlButtonsContainer');
+            searchIcon = document.getElementById('searchIcon'); // Initialize search icon
 
-            // Setze den Wert des Quick-Selects und den Placeholder beim Laden der Seite
+            loadSettings(); // areButtonsLocked is set to true here
+            setLanguage(currentLanguage); // Apply initial language from loaded settings
+
+            applyBackgroundSettings();
+            applyPageTitleSettings();
+            applyTabTitleSettings();
+            applySearchPosition();
+            applyGridSettings();
+            applySettingsButton();
+            applyToggleLockButtonState(); // Update UI status of the lock button
+            applyFavicon();
+
             quickSearchProviderSelect.value = currentActiveSearchProvider;
             googleSearchInput.placeholder = searchPlaceholders[currentActiveSearchProvider];
+            googleSearchInput.value = ''; // Set search bar value to empty on page load
+
+            // Create the line indicator once
+            lineIndicator = document.createElement('div');
+            lineIndicator.classList.add('line-indicator');
+            lineIndicator.style.width = '2px'; // Ensure it has a width
+            lineIndicator.style.display = 'none'; // Initially hidden
+
+            // Event listeners added here after elements are initialized
+            settingsButton.addEventListener('click', openSettingsModal);
+            toggleLockButtonsButton.addEventListener('click', () => {
+                areButtonsLocked = !areButtonsLocked;
+                applyToggleLockButtonState();
+                saveSettings(); // Does NOT save the lock status
+            });
+
+            // Global Drag & Drop Listeners for the tilesContainer
+            tilesContainer.addEventListener('dragover', handleDragOver);
+            tilesContainer.addEventListener('drop', handleDrop);
+            tilesContainer.addEventListener('dragleave', handleDragLeave);
+            tilesContainer.addEventListener('dragend', handleDragEnd); // Important for cleanup
+
+            // Event listener for the search icon
+            searchIcon.addEventListener('click', performSearch);
+            quickSearchProviderSelect.addEventListener('change', () => {
+                const selectedProvider = quickSearchProviderSelect.value;
+                googleSearchInput.placeholder = searchPlaceholders[selectedProvider];
+                currentActiveSearchProvider = selectedProvider;
+            });
+
+            // Initial rendering of buttons (and line indicator will be re-appended)
+            renderButtons();
         }
 
-        // Seite initialisieren, sobald der DOM geladen ist
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

@@ -1,6 +1,8 @@
 # Modulare-Browser-Startpage
 
+---
 
+This Page was not coded by me but was created by me through Gemini.
 
 ---
 

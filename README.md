@@ -10,7 +10,7 @@ This Page was not coded by me but was created by me through Gemini.
 
 ---
 
-## 🚀 Features
+##  Features
 
 * Customizable Page Title: You can customize the large title at the top of the page, change its font, or hide it entirely.
 * Customizable Tab Title and Favicon: Set the text that appears in the browser tab and upload a favicon.
@@ -63,6 +63,6 @@ This Page was not coded by me but was created by me through Gemini.
 * Saving Functionality: All settings are saved locally in your browser.
 ---
 
-## 🧪 Requirements
+##  Requirements
 
 * Your Favourite Browser

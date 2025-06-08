@@ -1,4 +1,4 @@
-# Modulare-Browser-Startpage
+# Modular-Browser-Startpage
 
 ---
 
